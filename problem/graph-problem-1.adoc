@@ -1,0 +1,399 @@
+= Simplified Graph Problem
+Martin Sponner <martin.sponner@sabrte.com>
+v1.0, 2018-11-28
+:latexmath:
+:imagesdir: images
+
+:numbered!:
+[abstract]
+== Abstract
+We can understand flight planning as a directed graph problem.
+Regulatory bodies define airways and allowed flight levels on those airways.
+Availability of those airways also has a time dimension, e.g. some airways are not available at night.
+When planning a flight depending on weather conditions and aircraft gross mass some airways at specific flight levels will be unusable.
+We can understand vertices as as 3D positions at a specific time and at specific gross mass.
+Transitioning from one vertex to another will require some time and some fuel.
+This build a directed graph latexmath:[ \mathscr{G}(V, E) ].
+
+This corresponds to the airspace graph latexmath:[ \mathscr{G}'(V', E') ].
+This graph has 3D vertices describing the lateral and the vertical position.
+Additionally edges of the airspace graph carry a time range information describing the validity of the edge.
+
+On top of airspace graph regulators are further restricting allowed flight paths by defining rules of following type:
+when planning tuse an airway segment from latexmath:[ A\subseteq E'] aircarft operator
+must not plan to have an following airspace segment out of latexmath:[ B\subseteq E'].
+latexmath:[ A ] and latexmath:[ B ] are each associated with a time range.
+
+There is a performance cost function latexmath:[ f(v):V\mapsto\mathbb{R}_+ ] that assigns a positive cost value to each vertex.
+This cost function basicaly considers cot of fuel and cost of time.
+
+Goal is the find a valid path not containing any restriction that is connecting the departure vertex
+latexmath:[ v_D\in V ] to an arrival vertex latexmath:[ v_A\in V_A ] so that performance cost is minimal.
+
+:toc:
+
+:numbered:
+
+== Model
+
+This section is describing the model in more detail.Here is the text of your introduction.
+
+=== Configuration Space of Full Graph
+
+The state of an aircraft (in context of this problem) can be defined by its laterals position giving
+latitude and longitude on the WGS84 model, the flight level, the actual gross mass, and the time.
+
+Latitude:: Angel between ellipsoid normal and equatorial plane. Positive latitude is on northern hemisphere.
++
+latexmath:[ \lambda \in [-90^\circ,\,90^\circ\] ]
+
+Longitude:: Angel in plane normal to earth axis between Zero Meridian and current position.
+Positive longitude is to the east of Greenwhic
++
+latexmath:[ \phi \in (-180^\circ,\,180^\circ\] ]
+
+Flight Level (FL):: Isobaric level as defined by ICAO and various authorities.
+In context of this problem it is a finite number of integer values.
++
+latexmath:[ h \in [0, 999) \subset\mathbb{N} ]
+
+Gross Mass (GM):: Gross mass of aircraft. Limited by heaviest airplanes built <<An225M>>.
+There are projects for much larger aircrafts. Compare Boeing Pelikan Ultraa <<BoePeU>>.
+Range of mass might increase in future.
++
+latexmath:[ m \in (0,\,640000\] ]
+
+Time:: Time on flight progress. We safely can limit flight endurance for commercial flights currently by 24h.
+Projects a striving for higher endurance also for commercial aircrafts <<BoePeU>>.
++
+latexmath:[ t \in [0, 86400\] ]
+
+The overall configuration defines possible vertices in our graph.
+
+Vertex:: A 5D state of an airplane in flight.
++
+latexmath:[\begin{align}
+  v = \begin{pmatrix}
+    \lambda \\
+    \phi \\
+    h \\
+    m \\
+    t
+  \end{pmatrix} \in V
+\end{align} ]
++
+where latexmath:[ V = [-90^\circ,\,90^\circ\]\times(-180^\circ,\,180^\circ\]\times\lbrace h\in \mathbb{N}:0<=h<999\rbrace\times(0,\,640000\]\times[0, 86400\] ]
+
+=== Airspace Graph
+
+The Airspace Graph latexmath:[ \mathscr{G}'(V',\,E') ] defines generally available connections
+between 3D points for a defined range of time.
+In this simple problem we are refering to the same time scale that we are using in configuration space.
+
+Vertixes are defined as
+latexmath:[\begin{align}
+  v' = \begin{pmatrix}
+    \lambda \\
+    \phi \\
+    h
+  \end{pmatrix} \in V'
+\end{align} ]
+
+where  latexmath:[ V' = [-90^\circ,\,90^\circ\]\times(-180^\circ,\,180^\circ\]\times\lbrace h\in \mathbb{N}:0<=h<999\rbrace ].
+
+Edges are connecting vertices and carry the additionel time range information.
+We can conmsider them being airways. They are ordered triples
+
+latexmath:[ \begin{align}
+  a = (v'_0,\,v'_1,\,r) = \begin{pmatrix}
+     \begin{pmatrix}
+       \lambda_0 \\
+       \phi_0 \\
+       h_0
+     \end{pmatrix},\,\begin{pmatrix}
+       \lambda_1 \\
+       \phi_1 \\
+       h_1
+     \end{pmatrix},\,\begin{pmatrix}
+       t^S \\
+       t^E
+     \end{pmatrix}
+  \end{pmatrix}
+\end{align} ]
+
+where latexmath:[ t^S,t^E \in [0, 86400\] ]
+
+==== Time Consistent Path
+
+A ((Time Conmsistent Path)) is a path in the airspace graph that has associated the union of time renges of all edges.
+And this unified time range is not empty.
+
+Let latexmath:[ r(a): E'\mapsto[0, 86400\]\times[0, 86400\] ] be the function delivering the time range of an airway.
+
+latexmath:[ r(a) = r(\begin{pmatrix}
+    \lambda_0 \\
+    \phi_0 \\
+    h_0
+  \end{pmatrix},\,\begin{pmatrix}
+    \lambda_1 \\
+    \phi_1 \\
+    h_1
+  \end{pmatrix},\,\begin{pmatrix}
+    t^S \\
+    t^E
+  \end{pmatrix}) = [t^S,\,t^E\] ]
+
+Consider path latexmath:[ p' = <a_0, a_1,\,...\,a_n> ] in airspace graph latexmath:[ \mathscr{G}' ].
+latexmath:[ p' ] is a time consitent path, if and only if latexmath:[ r(p') = r(<a_0, a_1,\,...\,a_n>) = \bigcap\limits_{i=0}^n r(a_i)\neq[\] ] is true.
+
+=== Edges Describing Transitions in Configuration Space
+
+Transitions between those vertices have to adhere to time specific design of airspace.
+
+latexmath:[\begin{eqnarray}
+  v_0 &= \begin{pmatrix}
+    \lambda_0 \\
+    \phi_0 \\
+    h_0 \\
+    m_0 \\
+    t_0
+  \end{pmatrix},\quad v_1 &= \begin{pmatrix}
+    \lambda_1 \\
+    \phi_1 \\
+    h_1 \\
+    m_1 \\
+    t_1
+  \end{pmatrix} \\
+\end{eqnarray}].
+
+And there exists a time consistent path latexmath:[ \begin{align} p' = <\begin{pmatrix}
+      \begin{pmatrix}
+        \lambda_0 \\
+        \phi_0 \\
+        h_0
+      \end{pmatrix},\,v_1',\,r_0
+    \end{pmatrix},\,a_1,\,a_2,\,...\,a_{n-1},\,\begin{pmatrix}
+      v_n',\,\begin{pmatrix}
+        \lambda_1 \\
+        \phi_1 \\
+        h_1
+      \end{pmatrix},\,r_n
+    \end{pmatrix}>
+  \end{align} ] in the airspce graph such that latexmath:[ [t_0,\,t_1\]\subseteq r(p') ].
+
+The two vertices and one time constint path era defining in the Full Graph an edge latexmath:[\begin{equation}
+  e = (v_0,\,v_1,\,p') = \\
+  = \begin{pmatrix}
+     \begin{pmatrix}
+        \lambda_0 \\
+        \phi_0 \\
+        h_0 \\
+        m_0 \\
+        t_0
+      \end{pmatrix},\quad \begin{pmatrix}
+        \lambda_1 \\
+        \phi_1 \\
+        h_1 \\
+        m_1 \\
+        t_1
+      \end{pmatrix},\quad <\begin{pmatrix}
+                                \begin{pmatrix}
+                                  \lambda_0 \\
+                                  \phi_0 \\
+                                  h_0
+                                \end{pmatrix},\,v_1',\,r_0
+                              \end{pmatrix},\,a_1,\,a_2,\,...\,a_{n-1},\,\begin{pmatrix}
+                                v_n',\,\begin{pmatrix}
+                                  \lambda_1 \\
+                                  \phi_1 \\
+                                  h_1
+                                \end{pmatrix},\,r_n
+                              \end{pmatrix}>
+  \end{pmatrix} \\
+\end{equation}]
+
+In addition those transitions need to respect ambiance conditions and performance conditions.
+Thus latexmath:[ m_1-m_0 ] is the exact fuel burn,
+and latexmath:[ t_1-t_0 ] the exact segment flight time to transition along the time constitent path latexmath:[ p ]
+starting with gross mass latexmath:[ m_0 ] at time latexmath:[ t_0 ].
+
+Those edges form the unrestricted full graph.
+
+=== Restrictions
+
+On top of the airspace graph latexmath:[ \mathscr{G}'(V',\,E') ] restrictions are defined.
+
+==== Airspace Sector
+
+An Airspace Sector is an ordered pair containing a subset of edges on the airspace graph
+and a time range describing the validity of this airspace sector. latexmath:[ s_A = (A,\,r_A) ]
+where latexmath:[ A\subseteq E': A\neq\lbrace\rbrace] and latexmath:[ r_A = \begin{pmatrix} t^S_A \\ t^E_A\end{pmatrix} ]
+with latexmath:[ t^S_A,\,t^E_A \in [0, 86400\] ].
+The function latexmath:[ r(s) = r(\begin{pmatrix}A,\,\begin{pmatrix} t^S \\ t^E\end{pmatrix}\end{pmatrix}) = [t^S,\,t^E\] ]
+assigns the validity time range to each airspace sector.
+
+A restriction is an ordered pair of airspace segments latexmath:[ (s_A, s_B) ].
+
+==== Penetrated Airspace Sector
+
+Let latexmath:[ p'(e) ] be the function extracting the time consistent path from an edge in the full graph.
+
+An edge latexmath:[ e \in E ] of the full graph penetrates an airspace sector
+latexmath:[ s=(A,\,\begin{pmatrix}t^S \\ t^E\end{pmatrix}) ], if and only if
+latexmath:[ \exists\,x\in[0,\,n\]:\quad p'(e)=<a_0,\,...a_x,\,...a_n>\wedge\,a_x\in A\wedge\,r(p'(e))\cap[t^S,t^E\]\neq[\] ].
+
+We write latexmath:[ e\diamond s ] to express edge latexmath:[ e ] in full graph penetrates airspace sector latexmath:[ s ].
+
+==== Applicable Restriction
+
+A restriction latexmath:[ R=(s_A, s_B) ] is applicable to a path latexmath:[ p ] in full graph latexmath:[ \mathscr{G} ],
+if and only if there exists an order pair of edges latexmath:[ (e_i,\,e_j) ] in the path latexmath:[ p ] such that:
+
+- latexmath:[ e_i ] is prior to latexmath:[ e_j ] in the path latexmath:[ p ].
+- latexmath:[ e_i\diamond s_A ]
+- latexmath:[ e_j\diamond s_B ]
+
+We write latexmath:[ R\,\Box\,p ] to express restriction latexmath:[ R ] is applicable to path latexmath:[ p ]
+in full graph latexmath:[ \mathscr{G} ].
+
+=== Airspace Model
+
+The airspace model latexmath:[ \mathscr{A}(\mathscr{G}',\,\mathscr{R}) ] holds a list of restrictions
+latexmath:[ \mathscr{R} = \lbrace\, (A,\,r): A \subseteq E' \wedge r=\begin{pmatrix}t^S \\t^E\end{pmatrix}\wedge\,t^S,\,t^E \in[0,\, 86400\]\,\wedge\,t^S<t^E\,\rbrace].
+
+=== Valid Path
+
+A path latexmath:[ p ] in the full graph latexmath:[ \mathscr{G} ] is a valid path
+in airspace model latexmath:[ \mathscr{A}(\mathscr{G}',\mathscr{R}) ],
+if and only if latexmath:[ \nexists\,R\in\mathscr{R}: R\,\Box\,p ].
+
+
+=== Departure Configuration and  Arrival Configurations
+
+There is only a single departure configuration latexmath:[ v_D = \begin{pmatrix}
+                                                                                   \lambda_D \\
+                                                                                   \phi_D \\
+                                                                                   h_D \\
+                                                                                   m_0 \\
+                                                                                   t_0
+                                                                                 \end{pmatrix} ] with
+latexmath:[ h_D = 0, t_0=0 ] and latexmath:[ (\lambda_D, \phi_D) ] are the geodetic coordinates from the departure airport.
+
+There are multiple arrival configurations latexmath:[ v = \begin{pmatrix}
+                                                                                   \lambda_A \\
+                                                                                   \phi_A \\
+                                                                                   h_A \\
+                                                                                   m \\
+                                                                                   t
+                                                                                 \end{pmatrix} \in V_A ] with
+latexmath:[ h_A = 0 ] and latexmath:[ (\lambda_A, \phi_A) ] are the geodetic coordinates from the arrival airport.
+
+
+=== Performance Cost Function
+
+The peerformance function basically considers burned fuel and accumulated flight time.
+Typically it will be linear in buirned fuel and non-linear and monotonically growing on the accumulated flight time.
+It can be calculated for each vertex in the full graph.
+But cost of time is only meaningful for vertices in the arrival configuration.
+
+latexmath:[ f(v):V\mapsto\mathbb{R}_+]
+
+We can assume that the function is linearly composed latexmath:[ f(v)=a f_F(v)+b f_T(v)]
+
+latexmath:[ f_F(v):V\mapsto\mathbb{R}_+]
+
+latexmath:[ f_T(v):V\mapsto\mathbb{R}_+]
+
+latexmath:[ \begin{align}f_F(\begin{pmatrix}
+                      \lambda \\
+                      \phi \\
+                      h \\
+                      m \\
+                      t
+                    \end{pmatrix}) = k(m-m_0)
+\end{align} ]
+
+latexmath:[ \begin{align}f_T(\begin{pmatrix}
+                      \lambda \\
+                      \phi \\
+                      h \\
+                      m \\
+                      t
+                    \end{pmatrix}) = \bar{f}_T(t)
+\end{align} ]
+
+With latexmath:[ t_i<t_j\implies\bar{f}(t_i)<=\bar{f}(t_j) ]
+
+== Optimization Goal
+
+Let latexmath:[ H(p) ] be the function delivering the start vertex, the head, of a path.
+
+Let latexmath:[ T(p) ] be the function delivering the end vertex, the tail, of a path.
+
+The path latexmath:[ p ] in full graph latexmath:[ \mathscr{G}(V, E) ] is a valid journey, if and only if following conditions hold:
+
+- Start vertex of the path latexmath:[ p ] is the departure configuration: latexmath:[ H(p)=v_D ]
+- End vertex of the path latexmath:[ p ] is an arrival configuration: latexmath:[ T(p)=v\cap v\in V_A ]
+- The path latexmath:[ p ] is a valid path.
+
+Let latexmath:[ J ] be the set of all valid journeys.
+
+Let latexmath:[ f(p)=f(T(p)) ] where latexmath:[ p \in J ].
+
+The optimization goal is to find a valid journey latexmath:[ \bar{p}\in J ] that has minimal performance cost.
+
+latexmath:[ \forall p\in J:f(\bar{p})<=f(p) ]
+
+== Naive Approximative Solution
+
+Choose gross mass and time as integers.
+
+latexmath:[ m \in (0,\,640000\]\subset\mathbb{N},\quad t \in [0, 86400\]\subset\mathbb{N} ]
+
+We give a recursive solution to solve the quantified problem.
+
+Solve single source shortest path on full graph latexmath:[ \mathscr{G}(V, E) ] ignoring all restrictions.
+Check if there exists an applicable restriction in latexmath:[ \mathscr{A}(\mathscr{G},\,\mathscr{R}) ].
+If no, we have found already the solution. If yes, use the airspace sectors latexmath:[ A ] and latexmath:[ B ]
+from the applicable restriction to produce two modified graphs
+latexmath:[ \mathscr{G}_A(V, E\setminus A),\quad\mathscr{G}_B(V, E\setminus B) ].
+Solving the same SSSP problem for both graphs will give latexmath:[ p_A ] and latexmath:[ p_B ].
+The one with the smaller cost is the overall solution.
+
+latexmath:[ \begin{align} p = \begin{cases} p_A, & \text{if}\quad f(p_A)<f(p_B) \\ p_B, & \text{otherwise} \end{cases} \end{align} ]
+
+== Potential Research Topics
+
+How is the number of restrictions influencing optimization time and memory?
+
+How is the size of restrictions (sum of airways in all airspace segments) influence optimization tiem and memory?
+
+:numbered!:
+
+[glossary]
+== Glossary
+
+[glossary]
+ICAO:: International Civil Aviation Organisation
+
+[bibliography]
+== Bibliography
+
+[bibliography]
+- [[[An225M]]] Wikipedia. 'Antonov An-225 Mriya'.
++
+Published at https://en.wikipedia.org/wiki/Antonov_An-225_Mriya. Accessed on 2018-11-29
+
+- [[[BoePeU]]] Wikipedia. 'Boeing Pelican ULTRA'.
++
+Published at https://en.wikipedia.org/wiki/Boeing_Pelican. Accessed on 2018-11-29
+
+ifdef::backend-docbook[]
+[index]
+== Index
+
+////////////////////////////////////////////////////////////////
+The index is normally left completely empty, it's contents being
+generated automatically by the DocBook toolchain.
+////////////////////////////////////////////////////////////////
+endif::backend-docbook[]
