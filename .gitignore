@@ -30,3 +30,26 @@
 *.exe
 *.out
 *.app
+
+# Visual Studio Stuff
+*.user
+*.vs/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# LaTeX/Texmaker litter
+*.aux
+*.log
+*.out
+*.pdf
+*.synctex.gz
+
+# Doxygen output
+msvc/RouteSearch/docs/
