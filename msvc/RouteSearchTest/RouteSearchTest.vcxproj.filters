@@ -18,9 +18,21 @@
     <ClInclude Include="catch.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Checks.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestGraph.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="TestMain.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="TestDijkstra.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Checks.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

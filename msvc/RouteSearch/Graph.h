@@ -1,8 +1,11 @@
+/// Contains the basic graph structures that we use for searching.
 #pragma once
 
 #include <vector>
 
-// Shadow graph nodes and edges
+/**
+ * The nodes of the Airspace proto-graph.
+ */
 struct Node
 {
 	float latitude;
@@ -10,13 +13,19 @@ struct Node
 	int flightlevel;
 };
 
+/**
+ * The edges of the Airspace proto-graph.
+ */
 struct Edge
 {
 	Node& from;
 	Node& to;
 };
 
-// Airspace "shadow" graph representation
+/**
+ * The Airspace proto-graph.
+ * In this graph, the nodes do not contain flight-specific attributes.
+ */
 class Graph
 {
 
@@ -34,3 +43,9 @@ private:
 	std::vector<Node> m_nodes;
 
 };
+
+
+/**
+ * Shared definition of a search result.
+ */
+using Path = std::vector<Node>;

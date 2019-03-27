@@ -18,9 +18,15 @@
     <ClInclude Include="Graph.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Dijkstra.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Graph.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Dijkstra.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

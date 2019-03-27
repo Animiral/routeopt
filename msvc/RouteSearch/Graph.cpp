@@ -10,6 +10,10 @@ Node& Graph::AddNode(Node node)
 
 void Graph::AddEdge(Edge edge)
 {
-
+	// TODO: implementation
 }
 
+std::vector<Node> const& Graph::Nodes() const
+{
+	return m_nodes;
+}

@@ -119,9 +119,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Dijkstra.h" />
     <ClInclude Include="Graph.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Dijkstra.cpp" />
     <ClCompile Include="Graph.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
