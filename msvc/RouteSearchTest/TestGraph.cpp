@@ -6,8 +6,10 @@
 TEST_CASE( "Graph construction" )
 {
 	Graph graph;
-	Node& a = graph.AddNode({10, 10, 100});
-	Node& b = graph.AddNode({20, 20, 110});
+	Node a{10, 10, 100};
+	Node b{20, 20, 110};
+	graph.AddNode(a);
+	graph.AddNode(b);
 	graph.AddNode({30, 10, 100});
 	graph.AddEdge({a, b});
 

@@ -7,8 +7,10 @@
 TEST_CASE( "Trivial search" )
 {
 	Graph graph;
-	Node& a = graph.AddNode({10, 10, 100});
-	Node& b = graph.AddNode({20, 20, 110});
+	Node a{10, 10, 100};
+	Node b{20, 20, 110};
+	graph.AddNode(a);
+	graph.AddNode(b);
 	graph.AddEdge({a, b});
 
 	Dijkstra dijkstra{graph};
@@ -16,7 +18,7 @@ TEST_CASE( "Trivial search" )
 	Path const& actual = dijkstra.result();
 	Path expected{a, b};
 
-	REQUIRE(IsPathEqual(actual, expected));
+	REQUIRE(actual == expected);
 }
 
 TEST_CASE( "Shorter Path" )
@@ -28,11 +30,16 @@ TEST_CASE( "Shorter Path" )
 	//  /         \
 	// a - c - d - e
 	Graph graph;
-	Node& a = graph.AddNode({0, 0, 100});
-	Node& b = graph.AddNode({100, 15, 100});
-	Node& c = graph.AddNode({0, 10, 100});
-	Node& d = graph.AddNode({0, 20, 100});
-	Node& e = graph.AddNode({0, 30, 100});
+	Node a{0, 0, 100};
+	Node b{100, 15, 100};
+	Node c{0, 10, 100};
+	Node d{0, 20, 100};
+	Node e{0, 30, 100};
+	graph.AddNode(a);
+	graph.AddNode(b);
+	graph.AddNode(c);
+	graph.AddNode(d);
+	graph.AddNode(e);
 	graph.AddEdge({a, b});
 	graph.AddEdge({b, e});
 	graph.AddEdge({a, c});
@@ -44,14 +51,16 @@ TEST_CASE( "Shorter Path" )
 	Path const& actual = dijkstra.result();
 	Path expected{a, c, d, e};
 	
-	REQUIRE(IsPathEqual(actual, expected));
+	REQUIRE(actual == expected);
 }
 
 TEST_CASE("Unsuccessful Search")
 {
 	Graph graph;
-	Node& a = graph.AddNode({10, 10, 100});
-	Node& b = graph.AddNode({20, 20, 110});
+	Node a{10, 10, 100};
+	Node b{20, 20, 110};
+	graph.AddNode(a);
+	graph.AddNode(b);
 
 	Dijkstra dijkstra{graph};
 	dijkstra.run(a, b);

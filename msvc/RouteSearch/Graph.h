@@ -2,6 +2,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 /**
  * The nodes of the Airspace proto-graph.
@@ -14,12 +15,17 @@ struct Node
 };
 
 /**
+ * Two nodes are equal if all their attributes are equal.
+ */
+bool operator==(Node lhs, Node rhs) noexcept;
+
+/**
  * The edges of the Airspace proto-graph.
  */
 struct Edge
 {
-	Node& from;
-	Node& to;
+	Node from;
+	Node to;
 };
 
 /**
@@ -33,14 +39,31 @@ public:
 
 	explicit Graph();
 
-	Node& AddNode(Node node);
+	void AddNode(Node node);
 	void AddEdge(Edge edge);
 
-	std::vector<Node> const& Nodes() const;
+	/**
+	 * Return all nodes in the Graph.
+	 */
+	std::vector<Node> const& Nodes() const noexcept;
+
+	/**
+	 * Return all nodes for the given node that are connected via an edge.
+	 * If the node does not exist in the graph, throw std::out_of_range.
+	 */
+	std::vector<Node> const& Neighbors(Node node) const;
 
 private:
 
 	std::vector<Node> m_nodes;
+
+	// Requirement for using Node as key in std::unordered_map
+	struct NodeHash
+	{
+		size_t operator()(Node node) const noexcept;
+	};
+
+	std::unordered_map<Node, std::vector<Node>, NodeHash> m_edges;
 
 };
 
