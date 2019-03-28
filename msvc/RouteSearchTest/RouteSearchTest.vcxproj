@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Checks.cpp" />
+    <ClCompile Include="TestCost.cpp" />
     <ClCompile Include="TestDijkstra.cpp" />
     <ClCompile Include="TestGraph.cpp" />
     <ClCompile Include="TestMain.cpp" />

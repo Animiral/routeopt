@@ -4,7 +4,7 @@
 #include "Dijkstra.h"
 #include "Checks.h"
 
-TEST_CASE( "Trivial search" )
+TEST_CASE("Trivial search")
 {
 	Graph graph;
 	Node a{10, 10, 100};
@@ -21,7 +21,7 @@ TEST_CASE( "Trivial search" )
 	REQUIRE(actual == expected);
 }
 
-TEST_CASE( "Shorter Path" )
+TEST_CASE("Shorter Path")
 {
 	// In this test case, despite the path via b traversing less nodes,
 	// the path via c and d is cheaper.

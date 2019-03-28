@@ -18,7 +18,7 @@ public:
 
 	/**
 	 * Find a path from the start node to the goal node.
-	 * After this call, the result and auxiliary data is stored in the class object.
+	 * After this call, the result and auxiliary data is stored in this object.
 	 */
 	void run(Node const& start, Node const& goal);
 

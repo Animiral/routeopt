@@ -18,7 +18,7 @@ void Graph::AddNode(Node node)
 
 void Graph::AddEdge(Edge edge)
 {
-	m_edges.at(edge.to); // explicit bounds check for target Node
+	(void) m_edges.at(edge.to); // explicit bounds check for target Node
 	m_edges.at(edge.from).push_back(edge.to);
 }
 
