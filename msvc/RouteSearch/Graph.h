@@ -40,6 +40,11 @@ public:
 	explicit Graph();
 
 	void AddNode(Node node);
+
+	/**
+	 * Add the Edge to the Graph.
+	 * @throw std::out_of_range if the to-Node is not in the graph.
+	 */
 	void AddEdge(Edge edge);
 
 	/**
@@ -49,7 +54,7 @@ public:
 
 	/**
 	 * Return all nodes for the given node that are connected via an edge.
-	 * If the node does not exist in the graph, throw std::out_of_range.
+	 * @throw std::out_of_range if the node does not exist in the graph.
 	 */
 	std::vector<Node> const& Neighbors(Node node) const;
 

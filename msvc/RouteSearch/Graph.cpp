@@ -12,12 +12,14 @@ Graph::Graph() = default;
 
 void Graph::AddNode(Node node)
 {
-	return m_nodes.push_back(node);
+	m_nodes.push_back(node);
+	m_edges[node]; // inserts empty vector
 }
 
 void Graph::AddEdge(Edge edge)
 {
-	// TODO: implementation
+	m_edges.at(edge.to); // explicit bounds check for target Node
+	m_edges.at(edge.from).push_back(edge.to);
 }
 
 std::vector<Node> const& Graph::Nodes() const noexcept
