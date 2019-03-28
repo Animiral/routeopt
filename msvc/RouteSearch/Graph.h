@@ -20,6 +20,14 @@ struct Node
 bool operator==(Node lhs, Node rhs) noexcept;
 
 /**
+ * This helper struct is a requirement for using Node as key in std::unordered_map.
+ */
+struct NodeHash
+{
+	size_t operator()(Node node) const noexcept;
+};
+
+/**
  * The edges of the Airspace proto-graph.
  */
 struct Edge
@@ -61,13 +69,6 @@ public:
 private:
 
 	std::vector<Node> m_nodes;
-
-	// Requirement for using Node as key in std::unordered_map
-	struct NodeHash
-	{
-		size_t operator()(Node node) const noexcept;
-	};
-
 	std::unordered_map<Node, std::vector<Node>, NodeHash> m_edges;
 
 };

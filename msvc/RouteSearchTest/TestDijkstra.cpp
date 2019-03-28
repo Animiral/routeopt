@@ -4,6 +4,13 @@
 #include "Dijkstra.h"
 #include "Checks.h"
 
+namespace
+{
+
+Cost cost; // dependency for all Dijkstra objects
+
+}
+
 TEST_CASE("Trivial search")
 {
 	Graph graph;
@@ -13,7 +20,7 @@ TEST_CASE("Trivial search")
 	graph.AddNode(b);
 	graph.AddEdge({a, b});
 
-	Dijkstra dijkstra{graph};
+	Dijkstra dijkstra{graph, cost};
 	dijkstra.run(a, b);
 	Path const& actual = dijkstra.result();
 	Path expected{a, b};
@@ -46,7 +53,7 @@ TEST_CASE("Shorter Path")
 	graph.AddEdge({c, d});
 	graph.AddEdge({d, e});
 
-	Dijkstra dijkstra{graph};
+	Dijkstra dijkstra{graph, cost};
 	dijkstra.run(a, e);
 	Path const& actual = dijkstra.result();
 	Path expected{a, c, d, e};
@@ -62,7 +69,7 @@ TEST_CASE("Unsuccessful Search")
 	graph.AddNode(a);
 	graph.AddNode(b);
 
-	Dijkstra dijkstra{graph};
+	Dijkstra dijkstra{graph, cost};
 	dijkstra.run(a, b);
 	Path const& result = dijkstra.result();
 
