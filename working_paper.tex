@@ -1,24 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Journal Article
-% LaTeX Template
-% Version 1.4 (15/5/16)
-%
-% This template has been downloaded from:
-% http://www.LaTeXTemplates.com
-%
-% Original author:
-% Frits Wenneker (http://www.howtotex.com) with extensive modifications by
-% Vel (vel@LaTeXTemplates.com)
-%
-% License:
-% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
-
 \documentclass{article}
 
 \usepackage[sc]{mathpazo} % Use the Palatino font
@@ -32,7 +11,7 @@
 \usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
 \usepackage{booktabs} % Horizontal rules in tables
 
-\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+% \usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
 
 \usepackage{enumitem} % Customized lists
 \setlist[itemize]{noitemsep} % Make itemize lists more compact
@@ -51,7 +30,7 @@
 \pagestyle{fancy} % All pages have headers and footers
 \fancyhead{} % Blank out the default header
 \fancyfoot{} % Blank out the default footer
-\fancyhead[C]{Running title $\bullet$ May 2016 $\bullet$ Vol. XXI, No. 1} % Custom header text
+\fancyhead[C]{BSc Thesis by Peter Neubauer} % Custom header text
 \fancyfoot[RO,LE]{\thepage} % Custom footer text
 
 \usepackage{titling} % Customizing the title section
@@ -110,7 +89,7 @@ In the real world, the problem is additionally complicated by factors that we do
 
 \item Fast-changing weather conditions that affect the cost and are predicted ahead of time
 
-\item{Overflight fees for flying through a country's airspace}
+\item Overflight fees for flying through a country's airspace
 
 \item Climbs and descents do not necessarily begin and end at waypoint coordinates in the airspace graph
 
@@ -149,6 +128,17 @@ This approach was inspired by an impementation used in the industry.
 
 \section{Performance Analysis}
 In this work, we examine the impact of airspace restrictions on the run-time performance of the reference solution in a real-world context.
+
+Our primary performance metric is the number of nodes visited in the search until we find a valid journey/route.
+
+Using an excerpt from a real-world airspace graph, we define a *benchmark set* of real-world city pairs for which we run our search algorithm.
+We then gradually introduce restrictions into the calculation and observe the resulting change in performance metrics.
+
+From the results, we assign an empirical difficulty rating to every restriction and compare it with other attributes of the restriction, like its size (number of nodes in the affected area) and time constraints.
+
+In conclusion, we derive a method to assess the risk that a specific restriction definition will have a harsh negative performance impact, i.e. be hard for our algorithm to handle.
+
+
 
 Possible items to explore:
 
