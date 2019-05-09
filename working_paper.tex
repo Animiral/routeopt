@@ -19,7 +19,7 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[twoside,twocolumn]{article}
+\documentclass{article}
 
 \usepackage[sc]{mathpazo} % Use the Palatino font
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
@@ -79,7 +79,8 @@
 \date{\today} % Leave empty to omit a date
 \renewcommand{\maketitlehookd}{%
 \begin{abstract}
-\noindent An analysis of a path search algorithm on an airspace graph with restrictions. This problem is derived from practical use cases of flight planning.
+\noindent In the domain of commercial flight planning, we deal with the hard problem of route optimization. Airlines, who operate flights between cities all over the world, aim to save costs while abiding by all laws and regulations.
+In this work, we implement a stripped-down and simplified variant of an industry-standard shortest-path algorithm. We examine the performance of the search with respect to airspace restrictions published by ATC (air traffic control) authorities.
 \end{abstract}
 }
 
@@ -94,13 +95,60 @@
 %	ARTICLE CONTENTS
 %----------------------------------------------------------------------------------------
 
-\section{First Steps}
+\section{Problem Definition}
+The goal of route optimization is to find a flight route with minimal or close to minimal cost in the given scenario.
 
-The first step towards analyzing the algorithm is an implementation using only the bare-bones necessary features: an A* search and one type of constraints.
+The flight route is flown along a series of waypoints, which are connected by airways called *segments*. These waypoints and segments form the nodes and edges in our problem *airspace graph*.
+
+Not every path through the airspace is permitted by regulations. The flight path must adhere to a list of rules set out by traffic control authorities. These rules may theoretically impose any formulation of arbitrary conditions on the journey, imposing a lot of complexity.
+
+The cost of the route is measured in fuel and time. A *cost index* is applied to put the two measures into relation, yielding a total measurable cost.
+
+In the real world, the problem is additionally complicated by factors that we do not consider in this work:
+
+\begin{itemize}
+
+\item Fast-changing weather conditions that affect the cost and are predicted ahead of time
+
+\item{Overflight fees for flying through a country's airspace}
+
+\item Climbs and descents do not necessarily begin and end at waypoint coordinates in the airspace graph
+
+\item The flight route must be covered by alternate airports in range in case of an emergency
+
+\item Free-route airspaces allow arbitrary flight trajectories besides the defined airspace network
+
+\item Aircraft performance depends on the properties of the aircraft, mainly its model supplied by the manufacturer
+
+\end{itemize}
+
+\subsection{The Airspace Graph}
+
+\subsection{Airspace Sectors}
+
+\subsection{Airspace Restrictions}
+
+\subsection{Performance Cost}
+
+\subsection{The Path Avoiding Forbidden Pairs Problem}
+
+\section{Reference Solution}
+We examine the performance of a simple solution using Dijkstra's Algorithm for finding a shortest path.
+In addition, we implement restrictions with an iterative approach. Every time we encounter a shortest-path solution that is disqualified for violating a restriction, we adapt the airspace graph accordingly and retry.
+This approach was inspired by an impementation used in the industry.
+
+\subsection{Dijkstra's Algorithm}
+
+(Illustration and pseudocode)
+
+\subsection{Formalized Restrictions}
+
+(Illustration and pseudocode)
 
 %------------------------------------------------
 
-\section{Next Steps}
+\section{Performance Analysis}
+In this work, we examine the impact of airspace restrictions on the run-time performance of the reference solution in a real-world context.
 
 Possible items to explore:
 
