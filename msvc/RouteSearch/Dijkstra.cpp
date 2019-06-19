@@ -7,13 +7,13 @@ namespace
 {
 
 /**
- * Represents a Node in our "open" set which we might explore.
+ * Represents a Waypoint in our "open" set which we might explore.
  */
 struct OpenNode
 {
-	Node node; //!< node data
-	CostValue cost; //!< cumulative cost to reach this Node
-	Node previous; //!< backtracking info for result
+	Waypoint node; //!< node data
+	CostValue cost; //!< cumulative cost to reach this Waypoint
+	Waypoint previous; //!< backtracking info for result
 
 	/**
 	 * This is a requirement for using OpenNode in std::lower_bound.
@@ -28,32 +28,32 @@ struct OpenNode
  * This type of container holds the nodes already visited.
  * It associates to the previous node along the shortest path.
  */
-using ClosedSet = std::unordered_map<Node, Node, NodeHash>;
+using ClosedSet = std::unordered_map<Waypoint, Waypoint, WaypointHash>;
 
 /**
  * After the algorithm has found the shortest path to every node in the
  * closed set, construct the shortest path to the goal from the backtrack
  * information.
- * @param closedSet map of path Nodes to predecessors
+ * @param closedSet map of path Waypoints to predecessors
  * @param start the terminal node for backtracking
  * @param goal the final node which must exist in the closed set
  */
-Path BacktrackResult(ClosedSet closedSet, Node start, Node goal);
+Path BacktrackResult(ClosedSet closedSet, Waypoint start, Waypoint goal);
 
 }
 
-Dijkstra::Dijkstra(Graph const& graph, Cost const& cost) : m_graph(graph), m_cost(cost)
+Dijkstra::Dijkstra(AirGraph const& graph, Cost const& cost) : m_graph(graph), m_cost(cost)
 {
 }
 
-void Dijkstra::run(Node start, Node goal)
+void Dijkstra::run(Waypoint start, Waypoint goal)
 {
 	// clear slate
 	m_result = {};
 
 	std::vector<OpenNode> open; // path tips to explore in descending order of cost
-	ClosedSet closed; // map of path Nodes to predecessors
-	OpenNode current; // Node currently under examination for shortest path
+	ClosedSet closed; // map of path Waypoints to predecessors
+	OpenNode current; // Waypoint currently under examination for shortest path
 
 	open.push_back({start, CostValue{}, {}}); // start with 0 cost
 
@@ -75,7 +75,7 @@ void Dijkstra::run(Node start, Node goal)
 		}
 
 		// explore all neighbors for paths
-		for(Node next : m_graph.Neighbors(current.node))
+		for(Waypoint next : m_graph.Neighbors(current.node))
 		{
 			if(closed.end() != closed.find(next))
 				break; // node already visited
@@ -96,11 +96,11 @@ Path const& Dijkstra::result() const
 namespace
 {
 
-Path BacktrackResult(ClosedSet closedSet, Node start, Node goal)
+Path BacktrackResult(ClosedSet closedSet, Waypoint start, Waypoint goal)
 {
 	Path path;
 
-	for(Node n = goal; !(start == n); n = closedSet.at(n)) {
+	for(Waypoint n = goal; !(start == n); n = closedSet.at(n)) {
 		path.push_back(n);
 	}
 

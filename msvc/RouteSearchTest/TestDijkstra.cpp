@@ -13,12 +13,12 @@ Cost cost; // dependency for all Dijkstra objects
 
 TEST_CASE("Trivial search")
 {
-	Graph graph;
-	Node a{10, 10, 100};
-	Node b{20, 20, 110};
-	graph.AddNode(a);
-	graph.AddNode(b);
-	graph.AddEdge({a, b});
+	AirGraph graph;
+	Waypoint a{10, 10, 100};
+	Waypoint b{20, 20, 110};
+	graph.AddWaypoint(a);
+	graph.AddWaypoint(b);
+	graph.AddAirway({a, b});
 
 	Dijkstra dijkstra{graph, cost};
 	dijkstra.run(a, b);
@@ -36,22 +36,22 @@ TEST_CASE("Shorter Path")
 	//   --- b ---
 	//  /         \
 	// a - c - d - e
-	Graph graph;
-	Node a{0, 0, 100};
-	Node b{100, 15, 100};
-	Node c{0, 10, 100};
-	Node d{0, 20, 100};
-	Node e{0, 30, 100};
-	graph.AddNode(a);
-	graph.AddNode(b);
-	graph.AddNode(c);
-	graph.AddNode(d);
-	graph.AddNode(e);
-	graph.AddEdge({a, b});
-	graph.AddEdge({b, e});
-	graph.AddEdge({a, c});
-	graph.AddEdge({c, d});
-	graph.AddEdge({d, e});
+	AirGraph graph;
+	Waypoint a{0, 0, 100};
+	Waypoint b{100, 15, 100};
+	Waypoint c{0, 10, 100};
+	Waypoint d{0, 20, 100};
+	Waypoint e{0, 30, 100};
+	graph.AddWaypoint(a);
+	graph.AddWaypoint(b);
+	graph.AddWaypoint(c);
+	graph.AddWaypoint(d);
+	graph.AddWaypoint(e);
+	graph.AddAirway({a, b});
+	graph.AddAirway({b, e});
+	graph.AddAirway({a, c});
+	graph.AddAirway({c, d});
+	graph.AddAirway({d, e});
 
 	Dijkstra dijkstra{graph, cost};
 	dijkstra.run(a, e);
@@ -63,11 +63,11 @@ TEST_CASE("Shorter Path")
 
 TEST_CASE("Unsuccessful Search")
 {
-	Graph graph;
-	Node a{10, 10, 100};
-	Node b{20, 20, 110};
-	graph.AddNode(a);
-	graph.AddNode(b);
+	AirGraph graph;
+	Waypoint a{10, 10, 100};
+	Waypoint b{20, 20, 110};
+	graph.AddWaypoint(a);
+	graph.AddWaypoint(b);
 
 	Dijkstra dijkstra{graph, cost};
 	dijkstra.run(a, b);

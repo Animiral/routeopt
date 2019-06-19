@@ -4,7 +4,7 @@
 #include "Cost.h"
 
 /**
- * Implementation of Dijkstra's algorithm for searching through the Graph structure.
+ * Implementation of Dijkstra's algorithm for searching through the AirGraph structure.
  * The algorithm keeps track of performance metrics like node visits and observes restrictions (TODO).
  */
 class Dijkstra
@@ -15,13 +15,13 @@ public:
 	/**
 	 * Construct the search with its dependency.
 	 */
-	Dijkstra(Graph const& graph, Cost const& cost);
+	Dijkstra(AirGraph const& graph, Cost const& cost);
 
 	/**
 	 * Find a path from the start node to the goal node.
 	 * After this call, the result and auxiliary data is stored in this object.
 	 */
-	void run(Node start, Node goal);
+	void run(Waypoint start, Waypoint goal);
 
 	/**
 	 * Return the path that was found in the last search run.
@@ -31,7 +31,7 @@ public:
 
 private:
 
-	Graph const& m_graph;
+	AirGraph const& m_graph;
 	Cost const& m_cost;
 	Path m_result; //!< Container for the result of the search run
 

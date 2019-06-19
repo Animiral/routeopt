@@ -21,6 +21,6 @@ public:
 	/**
 	 * Return the cost of flying along the specified edge.
 	 */
-	CostValue Calculate(Edge edge) const;
+	CostValue Calculate(Airway edge) const;
 
 };

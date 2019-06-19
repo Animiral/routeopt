@@ -1,6 +1,6 @@
 #include "Cost.h"
 
-CostValue Cost::Calculate(Edge edge) const
+CostValue Cost::Calculate(Airway edge) const
 {
 	// crappy stub implementation: flat earth + Manhattan distance
 	return edge.to.latitude - edge.from.latitude

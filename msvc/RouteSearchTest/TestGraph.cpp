@@ -1,42 +1,42 @@
-// Tests for basic functions of our Graph class
+// Tests for basic functions of our AirGraph class
 
 #include "catch.hpp"
 #include "Graph.h"
 
-TEST_CASE("Graph construction")
+TEST_CASE("AirGraph construction")
 {
-	Graph graph;
-	Node a{10, 10, 100};
-	Node b{20, 20, 110};
-	graph.AddNode(a);
-	graph.AddNode(b);
+	AirGraph graph;
+	Waypoint a{10, 10, 100};
+	Waypoint b{20, 20, 110};
+	graph.AddWaypoint(a);
+	graph.AddWaypoint(b);
 
-	SECTION("The Graph stores Nodes")
+	SECTION("The AirGraph stores Waypoints")
 	{
-		auto const& nodes = graph.Nodes();
+		auto const& nodes = graph.Waypoints();
 		REQUIRE(2 == nodes.size());
 		REQUIRE(a == nodes[0]);
 		REQUIRE(b == nodes[1]);
 	}
 
-	SECTION("The Graph stores Edges")
+	SECTION("The AirGraph stores Edges")
 	{
-		graph.AddEdge({a, b});
-		REQUIRE(std::vector<Node>{b} == graph.Neighbors(a));
+		graph.AddAirway({a, b});
+		REQUIRE(std::vector<Waypoint>{b} == graph.Neighbors(a));
 	}
 
-	SECTION("Throw on Neighbors() of nonexistant Node")
+	SECTION("Throw on Neighbors() of nonexistant Waypoint")
 	{
 		REQUIRE_THROWS(graph.Neighbors({0,0,0}));
 	}
 
-	SECTION("Throw on AddEdge() from nonexistant Node")
+	SECTION("Throw on AddAirway() from nonexistant Waypoint")
 	{
-		REQUIRE_THROWS(graph.AddEdge({{0,0,0}, b}));
+		REQUIRE_THROWS(graph.AddAirway({{0,0,0}, b}));
 	}
 
-	SECTION("Throw on AddEdge() to nonexistant Node")
+	SECTION("Throw on AddAirway() to nonexistant Waypoint")
 	{
-		REQUIRE_THROWS(graph.AddEdge({a, {0,0,0}}));
+		REQUIRE_THROWS(graph.AddAirway({a, {0,0,0}}));
 	}
 }
