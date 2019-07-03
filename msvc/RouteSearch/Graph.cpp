@@ -9,43 +9,58 @@ bool operator==(Waypoint lhs, Waypoint rhs) noexcept
 		lhs.flightlevel == rhs.flightlevel;
 }
 
-size_t WaypointHash::operator()(Waypoint node) const noexcept
+bool operator==(Airway lhs, Airway rhs) noexcept
 {
-	// based on sensible ranges for node attributes
-	return static_cast<size_t>(((node.latitude * 180) + node.longitude) * 1000 + node.flightlevel);
+	return
+		lhs.grossmass == rhs.grossmass &&
+		lhs.distance == rhs.distance &&
+		lhs.time == rhs.time &&
+		lhs.fuel == rhs.fuel;
 }
 
 AirGraph::AirGraph() = default;
 
-void AirGraph::AddWaypoint(Waypoint waypoint)
+AirGraph::NodeId AirGraph::AddNode(Waypoint waypoint)
 {
-	m_waypoints.push_back(waypoint);
-	m_outgoing[waypoint]; // inserts empty vector
+	NodeId id = m_nodes.size();
+	m_nodes.push_back({id, waypoint});
+	return id;
 }
 
-void AirGraph::AddAirway(Airway airway)
+AirGraph::EdgeId AirGraph::AddEdge(NodeId from, NodeId to, Airway airway)
 {
-	(void) m_outgoing.at(airway.to); // explicit bounds check for target Waypoint
-	m_outgoing.at(airway.from).push_back(airway);
+	if(from >= m_nodes.size() || to >= m_nodes.size()) {
+		throw std::out_of_range("AddEdge: node id out of range");
+	}
+
+	EdgeId id = m_edges.size();
+	m_edges.push_back({id, from, to, airway});
+	m_nodes[from].out_edges.push_back(id);
+	return id;
 }
 
-std::vector<Waypoint> const& AirGraph::Waypoints() const noexcept
+AirGraph::Node const& AirGraph::GetNode(NodeId id) const
 {
-	return m_waypoints;
+	return m_nodes.at(id);
 }
 
-std::vector<Airway> const& AirGraph::Outgoing(Waypoint waypoint) const
+std::vector<AirGraph::Node> const& AirGraph::GetNodes() const noexcept
 {
-	return m_outgoing.at(waypoint);
+	return m_nodes;
 }
 
-std::vector<Waypoint> const AirGraph::Neighbors(Waypoint waypoint) const
+AirGraph::Edge const& AirGraph::GetEdge(EdgeId id) const
 {
-	std::vector<Waypoint> neighbors;
-	auto& outWays = Outgoing(waypoint);
-	std::transform(outWays.begin(), outWays.end(), std::back_inserter(neighbors), [](const Airway& a) { return a.to; });
-	return neighbors;
+	return m_edges.at(id);
 }
+
+std::vector<AirGraph::Edge> const AirGraph::GetEdges() const
+{
+	return m_edges;
+}
+
+// *** GraphML input ***
+// The following functions enable us to read a file in GraphML format
 
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -83,7 +98,7 @@ Waypoint ConvertWaypoint(VertexDescriptor vertexDescriptor, const RawGraph& rawG
 	return waypoint;
 }
 
-Airway ConvertAirway(EdgeDescriptor edgeDescriptor, const RawGraph& rawGraph)
+std::tuple<AirGraph::NodeId, AirGraph::NodeId, Airway> ConvertAirway(EdgeDescriptor edgeDescriptor, const RawGraph& rawGraph)
 {
 	Airway airway;
 	airway.grossmass = boost::get(&GmlAirway::grossmass, rawGraph, edgeDescriptor);
@@ -91,10 +106,8 @@ Airway ConvertAirway(EdgeDescriptor edgeDescriptor, const RawGraph& rawGraph)
 	airway.time = boost::get(&GmlAirway::time, rawGraph, edgeDescriptor);
 	airway.fuel = boost::get(&GmlAirway::fuel, rawGraph, edgeDescriptor);
 	VertexDescriptor from = boost::source(edgeDescriptor, rawGraph);
-	airway.from = ConvertWaypoint(from, rawGraph);
 	VertexDescriptor to = boost::target(edgeDescriptor, rawGraph);
-	airway.to = ConvertWaypoint(to, rawGraph);
-	return airway;
+	return {from, to, airway};
 }
 
 }
@@ -123,14 +136,14 @@ AirGraph AirGraph::FromGraphML(std::string graphText)
 
 	for(auto v_it = vertices_begin; v_it != vertices_end; ++v_it) {
 		Waypoint waypoint = ConvertWaypoint(*v_it, rawGraph);
-		graph.AddWaypoint(waypoint);
+		graph.AddNode(waypoint);
 	}
 
 	auto[edges_begin, edges_end] = boost::edges(rawGraph);
 	
 	for(auto e_it = edges_begin; e_it != edges_end; ++e_it) {
-		Airway airway = ConvertAirway(*e_it, rawGraph);
-		graph.AddAirway(airway);
+		auto [from, to, airway] = ConvertAirway(*e_it, rawGraph);
+		graph.AddEdge(from, to, airway);
 	}
 
 	return graph;

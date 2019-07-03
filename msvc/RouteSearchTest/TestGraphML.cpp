@@ -14,6 +14,6 @@ TEST_CASE("Loading a GraphML graph")
 	std::string graphText;
 	if(std::getline(ifstream, graphText, {})) {
 		AirGraph graph{AirGraph::FromGraphML(graphText)};
-		REQUIRE(6 == graph.Waypoints().size());
+		REQUIRE(6 == graph.GetNodes().size());
 	}
 }

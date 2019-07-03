@@ -9,7 +9,7 @@
 TEST_CASE("Successful cost calculation")
 {
 	Cost cost;
-	Airway edge{{0, 0, 100}, {0, 10, 100}};
+	Airway airway{30000, 14.1f, 0.1f, 50.0f};
 	// TODO: implement cost
-	REQUIRE((cost.Calculate(edge) || "TODO: implement this test case"));
+	REQUIRE((cost.Calculate(airway) || "TODO: implement this test case"));
 }

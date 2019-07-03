@@ -6,39 +6,49 @@
 namespace
 {
 
+// shortcuts
+using NodeId = AirGraph::NodeId;
+using EdgeId = AirGraph::EdgeId;
+
 /**
- * Represents a Waypoint in our "open" set which we might explore.
+ * Represents a Node in our "open" set which we might explore.
  */
 struct OpenNode
 {
-	Waypoint node; //!< node data
+	NodeId node; //!< node data
 	CostValue cost; //!< cumulative cost to reach this Waypoint
-	Waypoint previous; //!< backtracking info for result
+	NodeId previous; //!< backtracking info for result
 
 	/**
-	 * This is a requirement for using OpenNode in std::lower_bound.
+	 * This is a requirement for using OpenNode in std::upper_bound.
+	 * Nodes are sorted in descending order of cost, such that the back()
+	 * of a sorted vector will hold the next interesting open node.
 	 */
 	bool operator<(OpenNode rhs) const noexcept
 	{
-		return this->cost < rhs.cost;
+		return this->cost > rhs.cost;
 	}
 };
 
 /**
  * This type of container holds the nodes already visited.
- * It associates to the previous node along the shortest path.
+ *
+ * Its associated edge points to the node from the previous node
+ * along the shortest path.
  */
-using ClosedSet = std::unordered_map<Waypoint, Waypoint, WaypointHash>;
+using ClosedSet = std::unordered_map<NodeId, EdgeId>;
 
 /**
  * After the algorithm has found the shortest path to every node in the
  * closed set, construct the shortest path to the goal from the backtrack
  * information.
+ *
+ * @param graph the containing graph
  * @param closedSet map of path Waypoints to predecessors
  * @param start the terminal node for backtracking
  * @param goal the final node which must exist in the closed set
  */
-Path BacktrackResult(ClosedSet closedSet, Waypoint start, Waypoint goal);
+Path BacktrackResult(AirGraph const& graph, ClosedSet closedSet, NodeId start, NodeId goal);
 
 }
 
@@ -46,7 +56,7 @@ Dijkstra::Dijkstra(AirGraph const& graph, Cost const& cost) : m_graph(graph), m_
 {
 }
 
-void Dijkstra::run(Waypoint start, Waypoint goal)
+void Dijkstra::run(NodeId start, NodeId goal)
 {
 	// clear slate
 	m_result = {};
@@ -70,18 +80,19 @@ void Dijkstra::run(Waypoint start, Waypoint goal)
 
 		if(current.node == goal)
 		{
-			m_result = BacktrackResult(closed, start, goal);
+			m_result = BacktrackResult(m_graph, closed, start, goal);
 			break;
 		}
 
 		// explore all neighbors for paths
-		for(Waypoint next : m_graph.Neighbors(current.node))
+		for(AirGraph::EdgeId edge_id : m_graph.GetNode(current.node).out_edges)
 		{
-			if(closed.end() != closed.find(next))
+			AirGraph::Edge const& edge = m_graph.GetEdge(edge_id);
+			if(closed.end() != closed.find(edge.to))
 				break; // node already visited
 
-			CostValue nextCost = m_cost.Calculate({current.node, next});
-			OpenNode nextOpen{next, nextCost, current.node};
+			CostValue nextCost = current.cost + m_cost.Calculate(edge.airway);
+			OpenNode nextOpen{edge.to, nextCost, edge_id};
 			auto it = std::lower_bound(open.begin(), open.end(), nextOpen);
 			open.insert(it, nextOpen);
 		}
@@ -96,16 +107,24 @@ Path const& Dijkstra::result() const
 namespace
 {
 
-Path BacktrackResult(ClosedSet closedSet, Waypoint start, Waypoint goal)
+Path BacktrackResult(AirGraph const& graph, ClosedSet closedSet, NodeId start, NodeId goal)
 {
 	Path path;
 
-	for(Waypoint n = goal; !(start == n); n = closedSet.at(n)) {
-		path.push_back(n);
-	}
+	NodeId n;
+	EdgeId e;
+	for(n = goal, e = closedSet.at(n);
+		!(start == n);
+		n = graph.GetEdge(e).from, e = closedSet.at(n)) {
 
-	path.push_back(start);
-	std::reverse(path.begin(), path.end());
+		path.nodes.push_back(n);
+		path.edges.push_back(e);
+	}
+	path.nodes.push_back(start);
+
+	std::reverse(path.nodes.begin(), path.nodes.end());
+	std::reverse(path.edges.begin(), path.edges.end());
+
 	return path;
 }
 

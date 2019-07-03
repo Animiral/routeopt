@@ -16,16 +16,18 @@ TEST_CASE("Trivial search")
 	AirGraph graph;
 	Waypoint a{10, 10, 100};
 	Waypoint b{20, 20, 110};
-	graph.AddWaypoint(a);
-	graph.AddWaypoint(b);
-	graph.AddAirway({a, b});
+	AirGraph::NodeId a_id = graph.AddNode(a);
+	AirGraph::NodeId b_id = graph.AddNode(b);
+	AirGraph::EdgeId ab_id = graph.AddEdge(a_id, b_id, {20000, 100.f, .5f, 100.f});
 
 	Dijkstra dijkstra{graph, cost};
-	dijkstra.run(a, b);
+	dijkstra.run(a_id, b_id);
 	Path const& actual = dijkstra.result();
-	Path expected{a, b};
+	std::vector<AirGraph::NodeId> expected_nodes{a_id, b_id};
+	std::vector<AirGraph::EdgeId> expected_edges{ab_id};
 
-	REQUIRE(actual == expected);
+	CHECK(actual.nodes == expected_nodes);
+	CHECK(actual.edges == expected_edges);
 }
 
 TEST_CASE("Shorter Path")
@@ -42,23 +44,25 @@ TEST_CASE("Shorter Path")
 	Waypoint c{0, 10, 100};
 	Waypoint d{0, 20, 100};
 	Waypoint e{0, 30, 100};
-	graph.AddWaypoint(a);
-	graph.AddWaypoint(b);
-	graph.AddWaypoint(c);
-	graph.AddWaypoint(d);
-	graph.AddWaypoint(e);
-	graph.AddAirway({a, b});
-	graph.AddAirway({b, e});
-	graph.AddAirway({a, c});
-	graph.AddAirway({c, d});
-	graph.AddAirway({d, e});
+	AirGraph::NodeId a_id = graph.AddNode(a);
+	AirGraph::NodeId b_id = graph.AddNode(b);
+	AirGraph::NodeId c_id = graph.AddNode(c);
+	AirGraph::NodeId d_id = graph.AddNode(d);
+	AirGraph::NodeId e_id = graph.AddNode(e);
+	graph.AddEdge(a_id, b_id, {20000, 150.f, .5f, 100.f});
+	graph.AddEdge(b_id, e_id, {20000, 150.f, .5f, 100.f});
+	AirGraph::EdgeId ac_id = graph.AddEdge(a_id, c_id, {20000, 10.f, .5f, 100.f});
+	AirGraph::EdgeId cd_id = graph.AddEdge(c_id, d_id, {20000, 10.f, .5f, 100.f});
+	AirGraph::EdgeId de_id = graph.AddEdge(d_id, e_id, {20000, 200.f, .5f, 100.f});
 
 	Dijkstra dijkstra{graph, cost};
-	dijkstra.run(a, e);
+	dijkstra.run(a_id, e_id);
 	Path const& actual = dijkstra.result();
-	Path expected{a, c, d, e};
-	
-	REQUIRE(actual == expected);
+	std::vector<AirGraph::NodeId> expected_nodes{a_id, c_id, d_id, e_id};
+	std::vector<AirGraph::EdgeId> expected_edges{ac_id, cd_id, de_id};
+
+	CHECK(actual.nodes == expected_nodes);
+	CHECK(actual.edges == expected_edges);
 }
 
 TEST_CASE("Unsuccessful Search")
@@ -66,12 +70,12 @@ TEST_CASE("Unsuccessful Search")
 	AirGraph graph;
 	Waypoint a{10, 10, 100};
 	Waypoint b{20, 20, 110};
-	graph.AddWaypoint(a);
-	graph.AddWaypoint(b);
+	AirGraph::NodeId a_id = graph.AddNode(a);
+	AirGraph::NodeId b_id = graph.AddNode(b);
 
 	Dijkstra dijkstra{graph, cost};
-	dijkstra.run(a, b);
+	dijkstra.run(a_id, b_id);
 	Path const& result = dijkstra.result();
 
-	REQUIRE(result.empty());
+	CHECK(result.nodes.empty());
 }
