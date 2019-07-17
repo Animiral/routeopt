@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="Checks.cpp" />
     <ClCompile Include="TestCost.cpp" />
+    <ClCompile Include="TestCounter.cpp" />
     <ClCompile Include="TestDijkstra.cpp" />
     <ClCompile Include="TestGraph.cpp" />
     <ClCompile Include="TestGraphML.cpp" />

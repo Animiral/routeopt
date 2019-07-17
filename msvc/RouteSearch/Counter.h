@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 /**
  * The Counter counts events related to route optimization performance.
  * These are the metrics that we are trying to optimize.
@@ -9,53 +11,59 @@ class Counter
 
 public:
 
-	Counter();
+	explicit Counter() noexcept;
+
+	/**
+	 * Return a string representation of the counter results.
+	 * It fits in a single line of our output report file.
+	 */
+	std::string ToCsv() const;
 
 	/**
 	 * Signal that a waypoint has been visited in the graph search.
 	 */
-	void NodeVisited();
+	void NodeVisited() noexcept;
 
 	/**
 	 * Signal that an airway (segment) has been visited in the graph search.
 	 */
-	void EdgeVisited();
+	void EdgeVisited() noexcept;
 
 	/**
 	 * Signal that a candidate solution has been found in the graph search.
 	 */
-	void PathFound();
+	void PathFound() noexcept;
 
 	/**
 	 * Signal that we did a lookup on aircraft performance data.
 	 * Since we do not model these lookups for now, it is disabled.
 	 */
-	//void ACperfLookup();
+	//void ACperfLookup() noexcept;
 
 	/**
 	 * Signal that a candidate path has been found to violate some restriction.
 	 */
-	void RestrictionViolated();
+	void RestrictionViolated() noexcept;
 
 	/**
 	 * Return the stored number of waypoints visited.
 	 */
-	long CountNodeVisited();
+	long CountNodeVisited() noexcept;
 
 	/**
 	 * Return the stored number of airways visited.
 	 */
-	long CountEdgeVisited();
+	long CountEdgeVisited() noexcept;
 
 	/**
 	 * Return the stored number of solutions found.
 	 */
-	long CountPathFound();
+	long CountPathFound() noexcept;
 
 	/**
 	 * Return the stored number of restrictions violated.
 	 */
-	long CountRestrictionViolated();
+	long CountRestrictionViolated() noexcept;
 
 private:
 
