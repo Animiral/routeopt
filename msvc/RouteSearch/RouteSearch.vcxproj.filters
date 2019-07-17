@@ -24,6 +24,9 @@
     <ClInclude Include="Cost.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Counter.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Graph.cpp">
@@ -33,6 +36,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Cost.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Counter.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

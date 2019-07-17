@@ -2,6 +2,7 @@
 
 #include "Graph.h"
 #include "Cost.h"
+#include "Counter.h"
 
 /**
  * Implementation of Dijkstra's algorithm for searching through the AirGraph structure.
@@ -16,6 +17,11 @@ public:
 	 * Construct the search with its dependency.
 	 */
 	Dijkstra(AirGraph const& graph, Cost const& cost);
+
+	/**
+	 * Configure the search to count performance events.
+	 */
+	void SetCounter(Counter& counter);
 
 	/**
 	 * Find a path from the start node to the goal node.
@@ -33,6 +39,7 @@ private:
 
 	AirGraph const& m_graph;
 	Cost const& m_cost;
+	Counter* m_counter; //!< Optional performance measurement dependency
 	Path m_result; //!< Container for the result of the search run
 
 };

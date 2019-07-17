@@ -52,8 +52,17 @@ Path BacktrackResult(AirGraph const& graph, ClosedSet closedSet, NodeId start, N
 
 }
 
-Dijkstra::Dijkstra(AirGraph const& graph, Cost const& cost) : m_graph(graph), m_cost(cost)
+Dijkstra::Dijkstra(AirGraph const& graph, Cost const& cost)
+	:
+	m_graph(graph),
+	m_cost(cost),
+	m_counter(nullptr)
 {
+}
+
+void Dijkstra::SetCounter(Counter& counter)
+{
+	m_counter = &counter;
 }
 
 void Dijkstra::run(NodeId start, NodeId goal)
@@ -73,6 +82,8 @@ void Dijkstra::run(NodeId start, NodeId goal)
 		current = open.back();
 		open.pop_back();
 
+		if(m_counter) m_counter->NodeVisited();
+
 		if(closed.end() != closed.find(current.node))
 			break; // node already visited
 
@@ -81,6 +92,7 @@ void Dijkstra::run(NodeId start, NodeId goal)
 		if(current.node == goal)
 		{
 			m_result = BacktrackResult(m_graph, closed, start, goal);
+			if(m_counter) m_counter->PathFound();
 			break;
 		}
 
@@ -95,6 +107,8 @@ void Dijkstra::run(NodeId start, NodeId goal)
 			OpenNode nextOpen{edge.to, nextCost, edge_id};
 			auto it = std::lower_bound(open.begin(), open.end(), nextOpen);
 			open.insert(it, nextOpen);
+			
+			if(m_counter) m_counter->EdgeVisited();
 		}
 	}
 }

@@ -120,11 +120,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Cost.h" />
+    <ClInclude Include="Counter.h" />
     <ClInclude Include="Dijkstra.h" />
     <ClInclude Include="Graph.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cost.cpp" />
+    <ClCompile Include="Counter.cpp" />
     <ClCompile Include="Dijkstra.cpp" />
     <ClCompile Include="Graph.cpp" />
   </ItemGroup>
