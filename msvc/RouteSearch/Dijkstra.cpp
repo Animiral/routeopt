@@ -101,7 +101,7 @@ void Dijkstra::run(NodeId start, NodeId goal)
 		{
 			AirGraph::Edge const& edge = m_graph.GetEdge(edge_id);
 			if(closed.end() != closed.find(edge.to))
-				break; // node already visited
+				continue; // node already visited
 
 			CostValue nextCost = current.cost + m_cost.Calculate(edge.airway);
 			OpenNode nextOpen{edge.to, nextCost, edge_id};

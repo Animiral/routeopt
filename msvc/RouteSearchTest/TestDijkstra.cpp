@@ -40,6 +40,38 @@ struct Scenario1
 	AirGraph::EdgeId ac_id, cd_id, de_id;
 };
 
+/**
+ * Another test graph with 6 nodes.
+ *
+ *  -->1-->3--->5-\
+ * 0        \      -->4
+ *  ----------->2-/
+ */
+struct Scenario2
+{
+	explicit Scenario2()
+		:
+		graph(),
+		a_id(graph.AddNode({0, 0, 100})   ),
+		b_id(graph.AddNode({100, -50, 100})),
+		c_id(graph.AddNode({300, 50, 100})  ),
+		d_id(graph.AddNode({200, -50, 100})  ),
+		e_id(graph.AddNode({300, -50, 100})  ),
+		f_id(graph.AddNode({400, 0, 100})  )
+	{
+		graph.AddEdge(a_id, b_id, {20000, 10.f, .5f, 100.f});
+		graph.AddEdge(a_id, c_id, {20000, 10.f, .5f, 100.f});
+		graph.AddEdge(b_id, d_id, {20000, 10.f, .5f, 100.f});
+		graph.AddEdge(d_id, c_id, {20000, 5.f, .5f, 100.f});
+		graph.AddEdge(c_id, e_id, {20000, 10.f, .5f, 100.f});
+		graph.AddEdge(d_id, f_id, {20000, 10.f, .5f, 100.f});
+		graph.AddEdge(f_id, e_id, {20000, 10.f, .5f, 100.f});
+	}
+
+	AirGraph graph;
+	AirGraph::NodeId a_id, b_id, c_id, d_id, e_id, f_id;
+};
+
 }
 
 
@@ -103,10 +135,26 @@ TEST_CASE("Counter With No Restrictions")
 	Dijkstra dijkstra{s.graph, cost};
 	dijkstra.SetCounter(counter);
 	dijkstra.run(s.a_id, s.e_id);
-	dijkstra.result();
 
 	CHECK(counter.CountNodeVisited() == 5); // every node was visited
 	CHECK(counter.CountEdgeVisited() == 5); // every edge was visited
+	CHECK(counter.CountPathFound() == 1); // one candidate solution
+	CHECK(counter.CountRestrictionViolated() == 0); // no restrictions
+}
+
+TEST_CASE("Bug continue out_edges")
+{
+	// Tests that a bug is fixed in which not all outgoing edges
+	// of a node were explored if one of them lead to a closed node.
+	Scenario2 s;
+	Counter counter;
+
+	Dijkstra dijkstra{s.graph, cost};
+	dijkstra.SetCounter(counter);
+	dijkstra.run(s.a_id, s.f_id);
+
+	CHECK(counter.CountNodeVisited() == 6); // every node was visited
+	CHECK(counter.CountEdgeVisited() == 5); // every edge was visited except 3->2 and 5->4
 	CHECK(counter.CountPathFound() == 1); // one candidate solution
 	CHECK(counter.CountRestrictionViolated() == 0); // no restrictions
 }
