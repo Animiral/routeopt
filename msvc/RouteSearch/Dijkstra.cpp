@@ -1,5 +1,6 @@
 #include "Dijkstra.h"
 #include <vector>
+#include <unordered_map>
 #include <set>
 #include <algorithm>
 
@@ -52,7 +53,7 @@ Path BacktrackResult(AirGraph const& graph, ClosedSet closedSet, NodeId start, N
 
 }
 
-Dijkstra::Dijkstra(AirGraph const& graph, Cost const& cost)
+Dijkstra::Dijkstra(AirGraph const& graph, Cost const& cost) noexcept
 	:
 	m_graph(graph),
 	m_cost(cost),
@@ -65,11 +66,8 @@ void Dijkstra::SetCounter(Counter& counter)
 	m_counter = &counter;
 }
 
-void Dijkstra::Run(NodeId start, NodeId goal)
+Path Dijkstra::Run(NodeId start, NodeId goal) const
 {
-	// clear slate
-	m_result = {};
-
 	std::vector<OpenNode> open; // path tips to explore in descending order of cost
 	ClosedSet closed; // map of path Waypoints to predecessors
 	OpenNode current; // Waypoint currently under examination for shortest path
@@ -91,17 +89,26 @@ void Dijkstra::Run(NodeId start, NodeId goal)
 
 		if(current.node == goal)
 		{
-			m_result = BacktrackResult(m_graph, closed, start, goal);
+			Path result = BacktrackResult(m_graph, closed, start, goal);
+			result.cost = current.cost;
+
 			if(m_counter) m_counter->PathFound();
-			break;
+
+			return result;
 		}
 
 		// explore all neighbors for paths
 		for(AirGraph::EdgeId edge_id : m_graph.GetNode(current.node).out_edges)
 		{
 			AirGraph::Edge const& edge = m_graph.GetEdge(edge_id);
+			
+			// ignore nodes already visited
 			if(closed.end() != closed.find(edge.to))
-				continue; // node already visited
+				continue;
+
+			// ignore disabled nodes
+			if(m_graph.GetNode(edge.to).disabled)
+				continue;
 
 			CostValue nextCost = current.cost + m_cost.Calculate(edge.airway);
 			OpenNode nextOpen{edge.to, nextCost, edge_id};
@@ -111,11 +118,8 @@ void Dijkstra::Run(NodeId start, NodeId goal)
 			if(m_counter) m_counter->EdgeVisited();
 		}
 	}
-}
 
-Path const& Dijkstra::Result() const
-{
-	return m_result;
+	return {}; // no path found
 }
 
 namespace

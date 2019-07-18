@@ -2,7 +2,6 @@
 #pragma once
 
 #include <vector>
-#include <unordered_map>
 
 /**
  * The node attributes of the airspace proto-graph.
@@ -51,9 +50,10 @@ public:
 
 	struct Node
 	{
-		NodeId id;
-		Waypoint waypoint;
-		std::vector<EdgeId> out_edges;
+		NodeId id; //!< unique node identifier number
+		bool disabled; //!< flag to remove the node from search
+		Waypoint waypoint; //!< Node attribute data
+		std::vector<EdgeId> out_edges; //!< list of connected edges
 	};
 
 	struct Edge
@@ -73,10 +73,9 @@ public:
 	NodeId AddNode(Waypoint waypoint);
 
 	/**
-	 * Remove the specified waypoint from the AirGraph.
-	 * All connected edges are also removed as a consequence.
+	 * Edit the disabled status of the specified waypoint in the AirGraph.
 	 */
-	void RemoveNode(NodeId id);
+	void SetNodeDisabled(NodeId id, bool disabled);
 
 	/**
 	 * Add the Airway to the AirGraph.
@@ -133,21 +132,4 @@ private:
 	std::vector<Node> m_nodes;
 	std::vector<Edge> m_edges;
 
-};
-
-
-/**
- * Shared definition of a search result.
- *
- * A path consists of the nodes and edges that one would visit, in order,
- * when going from the start (node 0) to the goal (node N).
- *
- * The edges [0 - 1-N] are the transitions between the nodes, such that
- * `graph.GetEdge(edges[i]).from == nodes[i]` and
- * `graph.GetEdge(edges[i]).to == nodes[i+1]`.
- */
-struct Path
-{
-	std::vector<AirGraph::NodeId> nodes;
-	std::vector<AirGraph::EdgeId> edges;
 };

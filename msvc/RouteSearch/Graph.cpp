@@ -23,17 +23,13 @@ AirGraph::AirGraph() = default;
 AirGraph::NodeId AirGraph::AddNode(Waypoint waypoint)
 {
 	NodeId id = m_nodes.size();
-	m_nodes.push_back({id, waypoint});
+	m_nodes.push_back({id, false, waypoint, {}});
 	return id;
 }
 
-void AirGraph::RemoveNode(NodeId id)
+void AirGraph::SetNodeDisabled(NodeId id, bool disabled)
 {
-	auto nodes_end = std::remove_if(m_nodes.begin(), m_nodes.end(), [id](const Node& n) { return n.id == id; });
-	m_nodes.erase(nodes_end, m_nodes.end());
-
-	auto edges_end = std::remove_if(m_edges.begin(), m_edges.end(), [id](const Edge& e) { return e.from == id || e.to == id; });
-	m_edges.erase(edges_end, m_edges.end());
+	m_nodes.at(id).disabled = disabled;
 }
 
 AirGraph::EdgeId AirGraph::AddEdge(NodeId from, NodeId to, Airway airway)

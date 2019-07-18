@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Graph.h"
+#include "Restriction.h"
 
 /**
  * A small test graph with 5 nodes.
@@ -34,4 +35,22 @@ struct Scenario2
 
 	AirGraph graph;
 	AirGraph::NodeId a_id, b_id, c_id, d_id, e_id, f_id;
+};
+
+/**
+ * A test graph with a restriction that will require multiple attempts.
+ * The most efficient route is a, b, c, d.
+ * Since (b, c) is restricted, the next cheaper option is a, c, d.
+ */
+	//  -5->b---30---\
+	// a      \5      -->d
+	//  ---20---->c-5/
+struct Scenario3
+{
+	explicit Scenario3();
+
+	AirGraph graph;
+	AirGraph::NodeId a_id, b_id, c_id, d_id;
+	AirGraph::EdgeId ab_id, ac_id, bc_id, bd_id, cd_id;
+	Restriction restriction;
 };

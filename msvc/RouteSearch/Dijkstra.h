@@ -2,6 +2,7 @@
 
 #include "Graph.h"
 #include "Cost.h"
+#include "Path.h"
 #include "Counter.h"
 
 /**
@@ -16,7 +17,7 @@ public:
 	/**
 	 * Construct the search with its dependency.
 	 */
-	Dijkstra(AirGraph const& graph, Cost const& cost);
+	explicit Dijkstra(AirGraph const& graph, Cost const& cost) noexcept;
 
 	/**
 	 * Configure the search to count performance events.
@@ -24,22 +25,15 @@ public:
 	void SetCounter(Counter& counter);
 
 	/**
-	 * Find a path from the start node to the goal node.
-	 * After this call, the result and auxiliary data is stored in this object.
-	 */
-	void Run(AirGraph::NodeId start, AirGraph::NodeId goal);
-
-	/**
-	 * Return the path that was found in the last search Run.
+	 * Return the cheapest path from the start node to the goal node.
 	 * If no search was executed or the search was not successful, return an empty path.
 	 */
-	Path const& Result() const;
+	Path Run(AirGraph::NodeId start, AirGraph::NodeId goal) const;
 
 private:
 
 	AirGraph const& m_graph;
 	Cost const& m_cost;
 	Counter* m_counter; //!< Optional performance measurement dependency
-	Path m_result; //!< Container for the result of the search Run
 
 };

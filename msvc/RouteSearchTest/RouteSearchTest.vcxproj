@@ -157,6 +157,7 @@
     <ClCompile Include="TestGraphML.cpp" />
     <ClCompile Include="TestMain.cpp" />
     <ClCompile Include="TestRestriction.cpp" />
+    <ClCompile Include="TestSearch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RouteSearch\RouteSearch.vcxproj">

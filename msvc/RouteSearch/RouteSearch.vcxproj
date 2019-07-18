@@ -123,6 +123,7 @@
     <ClInclude Include="Counter.h" />
     <ClInclude Include="Dijkstra.h" />
     <ClInclude Include="Graph.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="Restriction.h" />
     <ClInclude Include="Search.h" />
   </ItemGroup>

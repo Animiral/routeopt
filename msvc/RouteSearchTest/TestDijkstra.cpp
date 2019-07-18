@@ -23,13 +23,13 @@ TEST_CASE("Trivial search")
 	AirGraph::EdgeId ab_id = graph.AddEdge(a_id, b_id, {20000, 100.f, .5f, 100.f});
 
 	Dijkstra dijkstra{graph, cost};
-	dijkstra.Run(a_id, b_id);
-	Path const& actual = dijkstra.Result();
+	Path const& actual = dijkstra.Run(a_id, b_id);
 	std::vector<AirGraph::NodeId> expected_nodes{a_id, b_id};
 	std::vector<AirGraph::EdgeId> expected_edges{ab_id};
 
 	CHECK(actual.nodes == expected_nodes);
 	CHECK(actual.edges == expected_edges);
+	CHECK(actual.cost == 100.f);
 }
 
 TEST_CASE("Shorter Path")
@@ -39,13 +39,13 @@ TEST_CASE("Shorter Path")
 	Scenario1 s;
 
 	Dijkstra dijkstra{s.graph, cost};
-	dijkstra.Run(s.a_id, s.e_id);
-	Path const& actual = dijkstra.Result();
+	Path const& actual = dijkstra.Run(s.a_id, s.e_id);
 	std::vector<AirGraph::NodeId> expected_nodes{s.a_id, s.c_id, s.d_id, s.e_id};
 	std::vector<AirGraph::EdgeId> expected_edges{s.ac_id, s.cd_id, s.de_id};
 
 	CHECK(actual.nodes == expected_nodes);
 	CHECK(actual.edges == expected_edges);
+	CHECK(actual.cost == Approx(220.f));
 }
 
 TEST_CASE("Unsuccessful Search")
@@ -57,10 +57,26 @@ TEST_CASE("Unsuccessful Search")
 	AirGraph::NodeId b_id = graph.AddNode(b);
 
 	Dijkstra dijkstra{graph, cost};
-	dijkstra.Run(a_id, b_id);
-	Path const& result = dijkstra.Result();
+	Path const& result = dijkstra.Run(a_id, b_id);
 
 	CHECK(result.nodes.empty());
+}
+
+TEST_CASE("Search around Disabled Node")
+{
+	// In this test case, node c is disabled.
+	// The correct solution therefore must use node b.
+	Scenario1 s;
+
+	s.graph.SetNodeDisabled(s.c_id, true);
+	Dijkstra dijkstra{s.graph, cost};
+	Path const& actual = dijkstra.Run(s.a_id, s.e_id);
+	std::vector<AirGraph::NodeId> expected_nodes{s.a_id, s.b_id, s.e_id};
+	std::vector<AirGraph::EdgeId> expected_edges{s.ab_id, s.be_id};
+
+	CHECK(actual.nodes == expected_nodes);
+	CHECK(actual.edges == expected_edges);
+	CHECK(actual.cost == Approx(300.f));
 }
 
 TEST_CASE("Counter With No Restrictions")
