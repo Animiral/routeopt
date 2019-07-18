@@ -27,6 +27,12 @@
     <ClInclude Include="Counter.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Restriction.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Search.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Graph.cpp">
@@ -39,6 +45,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Counter.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Restriction.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Search.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

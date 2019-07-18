@@ -3,74 +3,12 @@
 #include "catch.hpp"
 #include "Dijkstra.h"
 #include "Graph.h"
-#include "Checks.h"
+#include "Scenario.h"
 
 namespace
 {
 
 Cost cost; // dependency for all Dijkstra objects
-
-/**
- * A small test graph with 5 nodes.
- *
- *   --- b ---
- *  /         \
- * a - c - d - e
- */
-struct Scenario1
-{
-	explicit Scenario1()
-		:
-		graph(),
-		a_id(graph.AddNode({0, 0, 100})   ),
-		b_id(graph.AddNode({100, 15, 100})),
-		c_id(graph.AddNode({0, 10, 100})  ),
-		d_id(graph.AddNode({0, 20, 100})  ),
-		e_id(graph.AddNode({0, 30, 100})  )
-	{
-		graph.AddEdge(a_id, b_id, {20000, 150.f, .5f, 100.f});
-		graph.AddEdge(b_id, e_id, {20000, 150.f, .5f, 100.f});
-		ac_id = graph.AddEdge(a_id, c_id, {20000, 10.f, .5f, 100.f});
-		cd_id = graph.AddEdge(c_id, d_id, {20000, 10.f, .5f, 100.f});
-		de_id = graph.AddEdge(d_id, e_id, {20000, 200.f, .5f, 100.f});
-	}
-
-	AirGraph graph;
-	AirGraph::NodeId a_id, b_id, c_id, d_id, e_id;
-	AirGraph::EdgeId ac_id, cd_id, de_id;
-};
-
-/**
- * Another test graph with 6 nodes.
- *
- *  -->1-->3--->5-\
- * 0        \      -->4
- *  ----------->2-/
- */
-struct Scenario2
-{
-	explicit Scenario2()
-		:
-		graph(),
-		a_id(graph.AddNode({0, 0, 100})   ),
-		b_id(graph.AddNode({100, -50, 100})),
-		c_id(graph.AddNode({300, 50, 100})  ),
-		d_id(graph.AddNode({200, -50, 100})  ),
-		e_id(graph.AddNode({300, -50, 100})  ),
-		f_id(graph.AddNode({400, 0, 100})  )
-	{
-		graph.AddEdge(a_id, b_id, {20000, 10.f, .5f, 100.f});
-		graph.AddEdge(a_id, c_id, {20000, 10.f, .5f, 100.f});
-		graph.AddEdge(b_id, d_id, {20000, 10.f, .5f, 100.f});
-		graph.AddEdge(d_id, c_id, {20000, 5.f, .5f, 100.f});
-		graph.AddEdge(c_id, e_id, {20000, 10.f, .5f, 100.f});
-		graph.AddEdge(d_id, f_id, {20000, 10.f, .5f, 100.f});
-		graph.AddEdge(f_id, e_id, {20000, 10.f, .5f, 100.f});
-	}
-
-	AirGraph graph;
-	AirGraph::NodeId a_id, b_id, c_id, d_id, e_id, f_id;
-};
 
 }
 

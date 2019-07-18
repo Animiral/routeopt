@@ -6,7 +6,7 @@
 
 /**
  * Implementation of Dijkstra's algorithm for searching through the AirGraph structure.
- * The algorithm keeps track of performance metrics like node visits and observes restrictions (TODO).
+ * The algorithm keeps track of performance metrics like node visits.
  */
 class Dijkstra
 {

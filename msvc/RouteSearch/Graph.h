@@ -73,6 +73,12 @@ public:
 	NodeId AddNode(Waypoint waypoint);
 
 	/**
+	 * Remove the specified waypoint from the AirGraph.
+	 * All connected edges are also removed as a consequence.
+	 */
+	void RemoveNode(NodeId id);
+
+	/**
 	 * Add the Airway to the AirGraph.
 	 *
 	 * @return the id of the resultant Edge.

@@ -18,7 +18,7 @@
     <ClInclude Include="catch.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Checks.h">
+    <ClInclude Include="Scenario.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,9 +32,6 @@
     <ClCompile Include="TestDijkstra.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Checks.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="TestCost.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -42,6 +39,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="TestCounter.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="TestRestriction.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Scenario.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

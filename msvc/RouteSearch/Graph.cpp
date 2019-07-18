@@ -27,6 +27,15 @@ AirGraph::NodeId AirGraph::AddNode(Waypoint waypoint)
 	return id;
 }
 
+void AirGraph::RemoveNode(NodeId id)
+{
+	auto nodes_end = std::remove_if(m_nodes.begin(), m_nodes.end(), [id](const Node& n) { return n.id == id; });
+	m_nodes.erase(nodes_end, m_nodes.end());
+
+	auto edges_end = std::remove_if(m_edges.begin(), m_edges.end(), [id](const Edge& e) { return e.from == id || e.to == id; });
+	m_edges.erase(edges_end, m_edges.end());
+}
+
 AirGraph::EdgeId AirGraph::AddEdge(NodeId from, NodeId to, Airway airway)
 {
 	if(from >= m_nodes.size() || to >= m_nodes.size()) {

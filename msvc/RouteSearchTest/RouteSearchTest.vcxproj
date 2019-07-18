@@ -146,16 +146,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="catch.hpp" />
-    <ClInclude Include="Checks.h" />
+    <ClInclude Include="Scenario.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Checks.cpp" />
+    <ClCompile Include="Scenario.cpp" />
     <ClCompile Include="TestCost.cpp" />
     <ClCompile Include="TestCounter.cpp" />
     <ClCompile Include="TestDijkstra.cpp" />
     <ClCompile Include="TestGraph.cpp" />
     <ClCompile Include="TestGraphML.cpp" />
     <ClCompile Include="TestMain.cpp" />
+    <ClCompile Include="TestRestriction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RouteSearch\RouteSearch.vcxproj">

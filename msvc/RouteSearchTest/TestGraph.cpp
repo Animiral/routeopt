@@ -1,5 +1,6 @@
 // Tests for basic functions of our AirGraph class
 
+#include <algorithm>
 #include "catch.hpp"
 #include "Graph.h"
 
@@ -74,3 +75,26 @@ TEST_CASE("AirGraph construction")
 		CHECK(ab_id == out_edges[0]);
 	}
 }
+
+TEST_CASE("RemoveNode from AirGraph")
+{
+	AirGraph graph;
+
+	AirGraph::NodeId a_id = graph.AddNode({10, 10, 100});
+	AirGraph::NodeId b_id = graph.AddNode({20, 20, 110});
+	AirGraph::NodeId c_id = graph.AddNode({30, 20, 110});
+	graph.AddEdge(a_id, b_id, {30000, 14.1f, 0.1f, 50.0f});
+	AirGraph::EdgeId bc_id = graph.AddEdge(b_id, c_id, {30000, 14.1f, 0.1f, 50.0f});
+	graph.AddEdge(c_id, a_id, {30000, 14.1f, 0.1f, 50.0f});
+
+	graph.RemoveNode(a_id);
+
+	const auto &ns = graph.GetNodes();
+	CHECK(2 == ns.size());
+	CHECK(std::all_of(ns.begin(), ns.end(), [a_id](const AirGraph::Node& n) { return n.id != a_id; }));
+
+	const auto &es = graph.GetEdges();
+	REQUIRE(1 == es.size());
+	CHECK(es[0].id == bc_id);
+}
+

@@ -123,12 +123,16 @@
     <ClInclude Include="Counter.h" />
     <ClInclude Include="Dijkstra.h" />
     <ClInclude Include="Graph.h" />
+    <ClInclude Include="Restriction.h" />
+    <ClInclude Include="Search.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cost.cpp" />
     <ClCompile Include="Counter.cpp" />
     <ClCompile Include="Dijkstra.cpp" />
     <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="Restriction.cpp" />
+    <ClCompile Include="Search.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
