@@ -85,8 +85,8 @@ TEST_CASE("Trivial search")
 	AirGraph::EdgeId ab_id = graph.AddEdge(a_id, b_id, {20000, 100.f, .5f, 100.f});
 
 	Dijkstra dijkstra{graph, cost};
-	dijkstra.run(a_id, b_id);
-	Path const& actual = dijkstra.result();
+	dijkstra.Run(a_id, b_id);
+	Path const& actual = dijkstra.Result();
 	std::vector<AirGraph::NodeId> expected_nodes{a_id, b_id};
 	std::vector<AirGraph::EdgeId> expected_edges{ab_id};
 
@@ -101,8 +101,8 @@ TEST_CASE("Shorter Path")
 	Scenario1 s;
 
 	Dijkstra dijkstra{s.graph, cost};
-	dijkstra.run(s.a_id, s.e_id);
-	Path const& actual = dijkstra.result();
+	dijkstra.Run(s.a_id, s.e_id);
+	Path const& actual = dijkstra.Result();
 	std::vector<AirGraph::NodeId> expected_nodes{s.a_id, s.c_id, s.d_id, s.e_id};
 	std::vector<AirGraph::EdgeId> expected_edges{s.ac_id, s.cd_id, s.de_id};
 
@@ -119,22 +119,22 @@ TEST_CASE("Unsuccessful Search")
 	AirGraph::NodeId b_id = graph.AddNode(b);
 
 	Dijkstra dijkstra{graph, cost};
-	dijkstra.run(a_id, b_id);
-	Path const& result = dijkstra.result();
+	dijkstra.Run(a_id, b_id);
+	Path const& result = dijkstra.Result();
 
 	CHECK(result.nodes.empty());
 }
 
 TEST_CASE("Counter With No Restrictions")
 {
-	// We run a small search and check whether it produces the
+	// We Run a small search and check whether it produces the
 	// expected number of performance events.
 	Scenario1 s;
 	Counter counter;
 
 	Dijkstra dijkstra{s.graph, cost};
 	dijkstra.SetCounter(counter);
-	dijkstra.run(s.a_id, s.e_id);
+	dijkstra.Run(s.a_id, s.e_id);
 
 	CHECK(counter.CountNodeVisited() == 5); // every node was visited
 	CHECK(counter.CountEdgeVisited() == 5); // every edge was visited
@@ -151,7 +151,7 @@ TEST_CASE("Bug continue out_edges")
 
 	Dijkstra dijkstra{s.graph, cost};
 	dijkstra.SetCounter(counter);
-	dijkstra.run(s.a_id, s.f_id);
+	dijkstra.Run(s.a_id, s.f_id);
 
 	CHECK(counter.CountNodeVisited() == 6); // every node was visited
 	CHECK(counter.CountEdgeVisited() == 5); // every edge was visited except 3->2 and 5->4

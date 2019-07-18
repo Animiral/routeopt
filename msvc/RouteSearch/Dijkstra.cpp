@@ -65,7 +65,7 @@ void Dijkstra::SetCounter(Counter& counter)
 	m_counter = &counter;
 }
 
-void Dijkstra::run(NodeId start, NodeId goal)
+void Dijkstra::Run(NodeId start, NodeId goal)
 {
 	// clear slate
 	m_result = {};
@@ -113,7 +113,7 @@ void Dijkstra::run(NodeId start, NodeId goal)
 	}
 }
 
-Path const& Dijkstra::result() const
+Path const& Dijkstra::Result() const
 {
 	return m_result;
 }

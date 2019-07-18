@@ -27,19 +27,19 @@ public:
 	 * Find a path from the start node to the goal node.
 	 * After this call, the result and auxiliary data is stored in this object.
 	 */
-	void run(AirGraph::NodeId start, AirGraph::NodeId goal);
+	void Run(AirGraph::NodeId start, AirGraph::NodeId goal);
 
 	/**
-	 * Return the path that was found in the last search run.
+	 * Return the path that was found in the last search Run.
 	 * If no search was executed or the search was not successful, return an empty path.
 	 */
-	Path const& result() const;
+	Path const& Result() const;
 
 private:
 
 	AirGraph const& m_graph;
 	Cost const& m_cost;
 	Counter* m_counter; //!< Optional performance measurement dependency
-	Path m_result; //!< Container for the result of the search run
+	Path m_result; //!< Container for the result of the search Run
 
 };
