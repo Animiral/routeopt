@@ -4,6 +4,7 @@
 bool operator==(Waypoint lhs, Waypoint rhs) noexcept
 {
 	return
+		lhs.name == rhs.name &&
 		lhs.latitude == rhs.latitude &&
 		lhs.longitude == rhs.longitude &&
 		lhs.flightlevel == rhs.flightlevel;
@@ -12,6 +13,7 @@ bool operator==(Waypoint lhs, Waypoint rhs) noexcept
 bool operator==(Airway lhs, Airway rhs) noexcept
 {
 	return
+		lhs.name == rhs.name &&
 		lhs.grossmass == rhs.grossmass &&
 		lhs.distance == rhs.distance &&
 		lhs.time == rhs.time &&
@@ -49,6 +51,12 @@ AirGraph::Node const& AirGraph::GetNode(NodeId id) const
 	return m_nodes.at(id);
 }
 
+AirGraph::Node const* AirGraph::FindNodeByName(std::string name) const noexcept
+{
+	auto it = std::find_if(m_nodes.begin(), m_nodes.end(), [&name](Node const& n) { return n.waypoint.name == name; });
+	return m_nodes.end() == it ? nullptr : &*it;
+}
+
 std::vector<AirGraph::Node> const& AirGraph::GetNodes() const noexcept
 {
 	return m_nodes;
@@ -57,6 +65,12 @@ std::vector<AirGraph::Node> const& AirGraph::GetNodes() const noexcept
 AirGraph::Edge const& AirGraph::GetEdge(EdgeId id) const
 {
 	return m_edges.at(id);
+}
+
+AirGraph::Edge const* AirGraph::FindEdgeByName(std::string name) const noexcept
+{
+	auto it = std::find_if(m_edges.begin(), m_edges.end(), [&name](Edge const& e) { return e.airway.name == name; });
+	return m_edges.end() == it ? nullptr : &*it;
 }
 
 std::vector<AirGraph::Edge> const AirGraph::GetEdges() const
@@ -76,6 +90,7 @@ namespace
 
 struct GmlWaypoint
 {
+	std::string name;
 	float latitude;
 	float longitude;
 	int flightlevel;
@@ -83,6 +98,7 @@ struct GmlWaypoint
 
 struct GmlAirway
 {
+	std::string name;
 	int grossmass;
 	float distance;
 	float time;
@@ -123,9 +139,11 @@ AirGraph AirGraph::FromGraphML(std::string graphText)
 	std::istringstream stream(graphText);
 
 	boost::dynamic_properties properties;
+	properties.property("name", boost::get(&GmlWaypoint::name, rawGraph));
 	properties.property("latitude", boost::get(&GmlWaypoint::latitude, rawGraph));
 	properties.property("longitude", boost::get(&GmlWaypoint::longitude, rawGraph));
 	properties.property("flightlevel", boost::get(&GmlWaypoint::flightlevel, rawGraph));
+	properties.property("name", boost::get(&GmlAirway::name, rawGraph));
 	properties.property("grossmass", boost::get(&GmlAirway::grossmass, rawGraph));
 	properties.property("distance", boost::get(&GmlAirway::distance, rawGraph));
 	properties.property("time", boost::get(&GmlAirway::time, rawGraph));

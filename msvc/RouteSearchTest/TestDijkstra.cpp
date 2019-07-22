@@ -16,11 +16,11 @@ Cost cost; // dependency for all Dijkstra objects
 TEST_CASE("Trivial search")
 {
 	AirGraph graph;
-	Waypoint a{10, 10, 100};
-	Waypoint b{20, 20, 110};
+	Waypoint a{"a", 10, 10, 100};
+	Waypoint b{"b", 20, 20, 110};
 	AirGraph::NodeId a_id = graph.AddNode(a);
 	AirGraph::NodeId b_id = graph.AddNode(b);
-	AirGraph::EdgeId ab_id = graph.AddEdge(a_id, b_id, {20000, 100.f, .5f, 100.f});
+	AirGraph::EdgeId ab_id = graph.AddEdge(a_id, b_id, {"ab", 20000, 100.f, .5f, 100.f});
 
 	Dijkstra dijkstra{graph, cost};
 	Path const& actual = dijkstra.Run(a_id, b_id);
@@ -51,8 +51,8 @@ TEST_CASE("Shorter Path")
 TEST_CASE("Unsuccessful Search")
 {
 	AirGraph graph;
-	Waypoint a{10, 10, 100};
-	Waypoint b{20, 20, 110};
+	Waypoint a{"a", 10, 10, 100};
+	Waypoint b{"b", 20, 20, 110};
 	AirGraph::NodeId a_id = graph.AddNode(a);
 	AirGraph::NodeId b_id = graph.AddNode(b);
 

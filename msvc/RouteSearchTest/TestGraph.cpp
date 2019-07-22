@@ -4,12 +4,12 @@
 #include "catch.hpp"
 #include "Graph.h"
 
-TEST_CASE("AirGraph construction")
+TEST_CASE("AirGraph Structure")
 {
 	AirGraph graph;
-	Waypoint wp_a{10, 10, 100}; /* lat, lng, fl */
-	Waypoint wp_b{20, 20, 110};
-	Airway awy_ab{30000, 14.1f, 0.1f, 50.0f}; /* gm, dist, time, fuel */
+	Waypoint wp_a{"a", 10, 10, 100}; /* name, lat, lng, fl */
+	Waypoint wp_b{"b", 20, 20, 110};
+	Airway awy_ab{"ab", 30000, 14.1f, 0.1f, 50.0f}; /* name, gm, dist, time, fuel */
 
 	AirGraph::NodeId a_id = graph.AddNode(wp_a);
 	AirGraph::NodeId b_id = graph.AddNode(wp_b);
@@ -17,12 +17,12 @@ TEST_CASE("AirGraph construction")
 
 	SECTION("Throw on AddEdge() from nonexistant Node")
 	{
-		REQUIRE_THROWS(graph.AddEdge((AirGraph::NodeId)100, b_id, {0,0,0,0}));
+		REQUIRE_THROWS(graph.AddEdge((AirGraph::NodeId)100, b_id, {"e",0,0,0,0}));
 	}
 
 	SECTION("Throw on AddEdge() to nonexistant Node")
 	{
-		REQUIRE_THROWS(graph.AddEdge(b_id, (AirGraph::NodeId)100, {0,0,0,0}));
+		REQUIRE_THROWS(graph.AddEdge(b_id, (AirGraph::NodeId)100, {"e",0,0,0,0}));
 	}
 
 	SECTION("retrieve Node by id")
@@ -30,6 +30,19 @@ TEST_CASE("AirGraph construction")
 		auto const& node = graph.GetNode(a_id);
 		CHECK(a_id == node.id);
 		CHECK(wp_a == node.waypoint);
+	}
+
+	SECTION("retrieve Node by name")
+	{
+		auto const* node = graph.FindNodeByName("a");
+		CHECK(a_id == node->id);
+		CHECK(wp_a == node->waypoint);
+	}
+
+	SECTION("Node does not exist by name")
+	{
+		auto const* node = graph.FindNodeByName("ab");
+		CHECK(nullptr == node);
 	}
 
 	SECTION("Throw on retrieve Node by invalid id")
@@ -56,6 +69,21 @@ TEST_CASE("AirGraph construction")
 		CHECK(awy_ab == edge.airway);
 	}
 
+	SECTION("retrieve Edge by name")
+	{
+		auto const& edge = graph.FindEdgeByName("ab");
+		CHECK(ab_id == edge->id);
+		CHECK(a_id == edge->from);
+		CHECK(b_id == edge->to);
+		CHECK(awy_ab == edge->airway);
+	}
+
+	SECTION("Edge does not exist by name")
+	{
+		auto const* edge = graph.FindEdgeByName("a");
+		CHECK(nullptr == edge);
+	}
+
 	SECTION("Throw on retrieve Edge by invalid id")
 	{
 		REQUIRE_THROWS(graph.GetEdge((AirGraph::EdgeId)100));
@@ -80,7 +108,7 @@ TEST_CASE("Disable Node of AirGraph")
 {
 	AirGraph graph;
 
-	AirGraph::NodeId a_id = graph.AddNode({10, 10, 100});
+	AirGraph::NodeId a_id = graph.AddNode({"a", 10, 10, 100});
 	graph.SetNodeDisabled(a_id, true);
 	CHECK(graph.GetNode(a_id).disabled);
 }

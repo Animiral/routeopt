@@ -2,12 +2,14 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 /**
  * The node attributes of the airspace proto-graph.
  */
 struct Waypoint
 {
+	std::string name;
 	float latitude;
 	float longitude;
 	int flightlevel;
@@ -23,6 +25,7 @@ bool operator==(Waypoint lhs, Waypoint rhs) noexcept;
  */
 struct Airway
 {
+	std::string name;
 	int grossmass;
 	float distance;
 	float time;
@@ -95,6 +98,14 @@ public:
 	Node const& GetNode(NodeId id) const;
 
 	/**
+	 * Return a pointer to a node with the specified name in the AirGraph.
+	 * If no such node exists, return nullptr.
+	 *
+	 * Caution! This reference may become invalid when the graph is mutated.
+	 */
+	Node const* FindNodeByName(std::string name) const noexcept;
+
+	/**
 	 * Return all nodes in the AirGraph.
 	 */
 	std::vector<Node> const& GetNodes() const noexcept;
@@ -107,6 +118,14 @@ public:
 	 * @throw std::out_of_range if there is no edge with the given id in the graph.
 	 */
 	Edge const& GetEdge(EdgeId id) const;
+
+	/**
+	 * Return a pointer to an edge with the specified name in the AirGraph.
+	 * If no such edge exists, return nullptr.
+	 *
+	 * Caution! This reference may become invalid when the graph is mutated.
+	 */
+	Edge const* FindEdgeByName(std::string name) const noexcept;
 
 	/**
 	 * Return all edges in the AirGraph.
