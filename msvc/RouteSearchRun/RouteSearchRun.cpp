@@ -16,12 +16,29 @@
 #include "Restriction.h"
 #include "Search.h"
 
+namespace
+{
+
+/**
+ * Convert the given string in Windows' 16-bit Unicode encoding
+ * (e.g. from command line or GUI elements) into an UTF-8 string
+ * compatible with strings from input files etc.
+ */
+std::string EncodingSysToU8(std::wstring sys_string);
+
+// debug functions
+void print_graph(const AirGraph& graph);
+void print_path(Path const& path, AirGraph const& graph);
+
+}
+
+
 int main()
 {
 	// convert command line arguments
-	LPWSTR commandLine = GetCommandLineW();
+	LPWSTR command_line = GetCommandLineW();
 	int argc;
-	LPWSTR* argv = CommandLineToArgvW(commandLine, &argc);
+	LPWSTR* argv = CommandLineToArgvW(command_line, &argc);
 
 	// parse command-line options
 	boost::program_options::options_description desc{"Options"};
@@ -78,6 +95,19 @@ int main()
 		return 0;
 	}
 
+	// dep/dest are identified by their waypoint name
+	std::string departure, destination;
+	try {
+		departure = EncodingSysToU8(opt["departure"].as<std::wstring>());
+		destination = EncodingSysToU8(opt["destination"].as<std::wstring>());
+	}
+	catch(std::exception ex) {
+		std::cerr << ex.what() << "\n";
+		char c;
+		std::cin >> c;
+		return 1;
+	}
+
 	// Read input data
 	std::string graph_text;
 
@@ -93,6 +123,15 @@ int main()
 
 	AirGraph graph{AirGraph::FromGraphML(graph_text)};
 	// print_graph(graph);
+	AirGraph::Node const* start = graph.FindNodeByName(departure);
+	AirGraph::Node const* goal = graph.FindNodeByName(destination);
+	if(nullptr == start || nullptr == goal) {
+			std::cerr << "Departure/destination not found in the graph: "
+				<< departure << "/" << destination << "\n";
+			char c;
+			std::cin >> c;
+			return 1;
+	}
 
 	std::vector<Restriction> restrictions;
 
@@ -104,34 +143,31 @@ int main()
 			std::regex token_ex("[^,]+");
 
 			// BUG: this is lacking in error handling
-			// BUG: uses our graph IDs instead of GraphML provided IDs
 			std::sregex_token_iterator it(line.begin(), line.end(), token_ex), end;
 			if(it != end) str_a = *it++;
 			if(it != end) str_b = *it++;
 
-			restrictions.push_back({
-				static_cast<AirGraph::NodeId>(std::stoi(str_a)),
-				static_cast<AirGraph::NodeId>(std::stoi(str_b))
-			});
+			AirGraph::Node const* node_a = graph.FindNodeByName(str_a);
+			AirGraph::Node const* node_b = graph.FindNodeByName(str_b);
+
+			if(node_a && node_b) {
+				restrictions.push_back({node_a->id, node_b->id});
+			}
+			else {
+				std::cerr << "Restriction points not found in the graph: "
+					<< str_a << "/" << str_b << "\n";
+				// this is not a fatal error - continue.
+			}
 		}
 	}
-	
+
 	Cost cost;
 	Dijkstra dijkstra(graph, cost);
 	Counter counter;
 	dijkstra.SetCounter(counter);
 	Search search{graph, dijkstra, restrictions};
 	search.SetCounter(counter);
-
-	// stopgap solution: dep/dest are identified by their node id
-	// BUG: uses our graph IDs instead of GraphML provided IDs
-	std::wistringstream dep_stream(opt["departure"].as<std::wstring>());
-	std::wistringstream dest_stream(opt["destination"].as<std::wstring>());
-	AirGraph::NodeId start, goal;
-	dep_stream >> start;
-	dest_stream >> goal;
-
-	search.Run(start, goal);
+	Path path = search.Run(start->id, goal->id);
 
 	std::ofstream report_fstream;
 	std::ostream* report_stream = &std::cout;
@@ -152,9 +188,32 @@ int main()
 	if(report_fstream.is_open())
 		report_fstream.close();
 
+	// The actual solution goes to cout for interactive inspection.
+	// We do not actually need this information for performance measurement.
+	print_path(path, graph);
+
 	char c;
 	std::cin >> c;
 	return 0;
+}
+
+namespace
+{
+
+std::string EncodingSysToU8(std::wstring sys_string)
+{
+	std::string u8string(4 * sys_string.size(), ' ');
+
+	int u8bytes = WideCharToMultiByte(CP_UTF8, 0,
+		sys_string.data(), (int)sys_string.size() + 1,
+		u8string.data(), (int)u8string.size(), NULL, NULL);
+	
+	if(0 == u8bytes) {
+		throw std::exception("Failed unicode conversion.");
+	}
+
+	u8string.resize(u8bytes - 1); // drop 0 terminator as it is handled by std::string
+	return u8string;
 }
 
 [[maybe_unused]]
@@ -178,4 +237,22 @@ void print_graph(const AirGraph& graph)
 				<< ") [" << to.latitude << "," << to.longitude << "]\n";
 		}
 	}
+}
+
+[[maybe_unused]]
+void print_path(Path const& path, AirGraph const& graph)
+{
+	for(int i = 0; i < path.nodes.size(); i++) {
+		AirGraph::Node const& node = graph.GetNode(path.nodes[i]);
+		std::cout << node.waypoint.name;
+
+		if(i < path.edges.size()) {
+			AirGraph::Edge const& edge = graph.GetEdge(path.edges[i]);
+			std::cout << " - (" << edge.airway.name << ") - ";
+		}
+	}
+
+	std::cout << "\nCost: " << path.cost << "\n";
+}
+
 }

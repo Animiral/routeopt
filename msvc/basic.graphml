@@ -3,81 +3,96 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns 
         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="name" for="node" attr.name="name" attr.type="string" />
   <key id="lat" for="node" attr.name="latitude" attr.type="float" />
   <key id="lng" for="node" attr.name="longitude" attr.type="float" />
   <key id="fl" for="node" attr.name="flightlevel" attr.type="int" />
   <key id="gm" for="edge" attr.name="grossmass" attr.type="int" />
+  <key id="name" for="edge" attr.name="name" attr.type="string" />
   <key id="dist" for="edge" attr.name="distance" attr.type="float" />
   <key id="time" for="edge" attr.name="time" attr.type="float" />
   <key id="fuel" for="edge" attr.name="fuel" attr.type="float" />
   <graph id="G" edgedefault="undirected">
     <node id="n0">
+      <data key="name">n0</data>
       <data key="lat">10</data>
       <data key="lng">10</data>
       <data key="fl">100</data>
     </node>
     <node id="n1">
+      <data key="name">n1</data>
       <data key="lat">20</data>
       <data key="lng">10</data>
       <data key="fl">100</data>
     </node>
     <node id="n2">
+      <data key="name">n2</data>
       <data key="lat">10</data>
       <data key="lng">20</data>
       <data key="fl">100</data>
     </node>
     <node id="n3">
+      <data key="name">n3</data>
       <data key="lat">20</data>
       <data key="lng">20</data>
       <data key="fl">100</data>
     </node>
     <node id="n4">
+      <data key="name">n4</data>
       <data key="lat">30</data>
       <data key="lng">10</data>
       <data key="fl">100</data>
     </node>
     <node id="n5">
+      <data key="name">n5</data>
       <data key="lat">30</data>
       <data key="lng">20</data>
       <data key="fl">100</data>
     </node>
     <edge id="e0" source="n0" target="n2">
+      <data key="name">e0</data>
       <data key="gm">30000</data>
       <data key="dist">10</data>
       <data key="time">60</data>
       <data key="fuel">10</data>
     </edge>
     <edge id="e1" source="n0" target="n1">
+      <data key="name">e1</data>
       <data key="gm">30000</data>
       <data key="dist">10</data>
       <data key="time">60</data>
       <data key="fuel">10</data>
     </edge>
     <edge id="e2" source="n1" target="n3">
+      <data key="name">e2</data>
       <data key="gm">30000</data>
       <data key="dist">10</data>
       <data key="time">60</data>
       <data key="fuel">10</data>
     </edge>
     <edge id="e3" source="n3" target="n2">
+      <data key="name">e3</data>
       <data key="gm">30000</data>
       <data key="dist">10</data>
       <data key="time">60</data>
       <data key="fuel">10</data>
     </edge>
     <edge id="e4" source="n2" target="n4">
+      <data key="name">e4</data>
       <data key="gm">30000</data>
       <data key="dist">10</data>
       <data key="time">60</data>
       <data key="fuel">10</data>
     </edge>
     <edge id="e5" source="n3" target="n5">
+      <data key="name">e5</data>
       <data key="gm">30000</data>
       <data key="dist">10</data>
       <data key="time">60</data>
       <data key="fuel">10</data>
     </edge>
     <edge id="e6" source="n5" target="n4">
+      <data key="name">e6</data>
       <data key="gm">30000</data>
       <data key="dist">10</data>
       <data key="time">60</data>

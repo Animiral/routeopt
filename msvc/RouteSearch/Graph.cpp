@@ -113,6 +113,7 @@ using EdgeDescriptor = boost::graph_traits<RawGraph>::edge_descriptor;
 Waypoint ConvertWaypoint(VertexDescriptor vertexDescriptor, const RawGraph& rawGraph)
 {
 	Waypoint waypoint;
+	waypoint.name = boost::get(&GmlWaypoint::name, rawGraph, vertexDescriptor);
 	waypoint.latitude = boost::get(&GmlWaypoint::latitude, rawGraph, vertexDescriptor);
 	waypoint.longitude = boost::get(&GmlWaypoint::longitude, rawGraph, vertexDescriptor);
 	waypoint.flightlevel = boost::get(&GmlWaypoint::flightlevel, rawGraph, vertexDescriptor);
@@ -122,6 +123,7 @@ Waypoint ConvertWaypoint(VertexDescriptor vertexDescriptor, const RawGraph& rawG
 std::tuple<AirGraph::NodeId, AirGraph::NodeId, Airway> ConvertAirway(EdgeDescriptor edgeDescriptor, const RawGraph& rawGraph)
 {
 	Airway airway;
+	airway.name = boost::get(&GmlAirway::name, rawGraph, edgeDescriptor);
 	airway.grossmass = boost::get(&GmlAirway::grossmass, rawGraph, edgeDescriptor);
 	airway.distance = boost::get(&GmlAirway::distance, rawGraph, edgeDescriptor);
 	airway.time = boost::get(&GmlAirway::time, rawGraph, edgeDescriptor);
