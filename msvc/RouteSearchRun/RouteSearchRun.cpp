@@ -6,6 +6,7 @@
 #include <fstream>
 #include <regex>
 #include <iostream>
+#include <cstdlib>
 #include <windows.h>
 //#include <Processenv.h>
 //#include <shellapi.h>
@@ -15,6 +16,7 @@
 #include "Dijkstra.h"
 #include "Restriction.h"
 #include "Search.h"
+
 
 namespace
 {
@@ -26,9 +28,21 @@ namespace
  */
 std::string EncodingSysToU8(std::wstring sys_string);
 
+bool interactive = false; //!< running in "interactive mode"
+
+/**
+ * If the application is in interactive mode, pause so that the user can view
+ * the console output before the program ends.
+ * Finally, call std::exit(code);
+ */
+[[noreturn]]
+void PauseAndExit(int code = 0);
+
 // debug functions
-void print_graph(const AirGraph& graph);
-void print_path(Path const& path, AirGraph const& graph);
+[[maybe_unused]]
+void PrintGraph(const AirGraph& graph);
+[[maybe_unused]]
+void PrintPath(Path const& path, AirGraph const& graph);
 
 }
 
@@ -50,10 +64,9 @@ int main()
 		("restrictions,r", wvalue<std::wstring>(), "Restrictions File")
 		("departure,dep", wvalue<std::wstring>(), "Departure Waypoint Identifier")
 		("destination,dest", wvalue<std::wstring>(), "Destination Waypoint Identifier")
-		("report,o", wvalue<std::wstring>(), "Performance Report Output File");
-		//("graph", value<std::string>()->default_value(3.14f), "Pi")
-		//("age", value<int>()->notifier(on_age), "Age");
-	
+		("report,o", wvalue<std::wstring>(), "Performance Report Output File")
+		("interactive,i", "Interactive Console");
+
 	boost::program_options::variables_map opt;
 	bool normal_mode = true; // continue with search after options
 
@@ -70,7 +83,9 @@ int main()
 		std::cout << desc << '\n';
 		normal_mode = false;
 	}
-	
+
+	interactive = static_cast<bool>(opt.count("interactive"));
+
 	if(opt.count("graph") + opt.count("departure") + opt.count("destination") != 3) {
 		std::cerr << "Mandatory options missing (graph, departure, destination)." << '\n';
 		normal_mode = false;
@@ -90,9 +105,7 @@ int main()
 	// early exit
 	if(!normal_mode)
 	{
-		char c;
-		std::cin >> c;
-		return 0;
+		PauseAndExit(0);
 	}
 
 	// dep/dest are identified by their waypoint name
@@ -103,9 +116,7 @@ int main()
 	}
 	catch(std::exception ex) {
 		std::cerr << ex.what() << "\n";
-		char c;
-		std::cin >> c;
-		return 1;
+		PauseAndExit(1);
 	}
 
 	// Read input data
@@ -115,22 +126,18 @@ int main()
 		std::ifstream graph_stream(graph_path);
 		if(!std::getline(graph_stream, graph_text, {})) {
 			std::cerr << "Failed to read graph from " << graph_path << "\n";
-			char c;
-			std::cin >> c;
-			return 1;
+			PauseAndExit(1);
 		}
 	}
 
 	AirGraph graph{AirGraph::FromGraphML(graph_text)};
-	// print_graph(graph);
+	// PrintGraph(graph);
 	AirGraph::Node const* start = graph.FindNodeByName(departure);
 	AirGraph::Node const* goal = graph.FindNodeByName(destination);
 	if(nullptr == start || nullptr == goal) {
 			std::cerr << "Departure/destination not found in the graph: "
 				<< departure << "/" << destination << "\n";
-			char c;
-			std::cin >> c;
-			return 1;
+			PauseAndExit(1);
 	}
 
 	std::vector<Restriction> restrictions;
@@ -176,9 +183,7 @@ int main()
 		report_fstream.open(report_path, std::ios::app);
 		if(!report_fstream) {
 			std::cerr << "Failed to write report to " << report_path << "\n";
-			char c;
-			std::cin >> c;
-			return 1;
+			PauseAndExit(1);
 		}
 		report_stream = &report_fstream;
 	}
@@ -190,12 +195,13 @@ int main()
 
 	// The actual solution goes to cout for interactive inspection.
 	// We do not actually need this information for performance measurement.
-	print_path(path, graph);
+	PrintPath(path, graph);
 
 	char c;
 	std::cin >> c;
 	return 0;
 }
+
 
 namespace
 {
@@ -216,8 +222,25 @@ std::string EncodingSysToU8(std::wstring sys_string)
 	return u8string;
 }
 
-[[maybe_unused]]
-void print_graph(const AirGraph& graph)
+void PauseAndExit(int code)
+{
+	if(interactive) {
+		// https://helloacm.com/modern-getch-implementation-on-windows-cc/
+		HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+		if (h != NULL) {
+			DWORD mode, cc;
+			GetConsoleMode(h, &mode);
+			SetConsoleMode(h, mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT));
+			wchar_t c = 0;
+			ReadConsoleW(h, &c, 1, &cc, NULL);
+			SetConsoleMode(h, mode);
+			// discard read character
+		}
+	}
+	std::exit(code);
+}
+
+void PrintGraph(const AirGraph& graph)
 {
 	const auto nodes = graph.GetNodes();
 	for(const auto node : nodes) {
@@ -239,8 +262,7 @@ void print_graph(const AirGraph& graph)
 	}
 }
 
-[[maybe_unused]]
-void print_path(Path const& path, AirGraph const& graph)
+void PrintPath(Path const& path, AirGraph const& graph)
 {
 	for(int i = 0; i < path.nodes.size(); i++) {
 		AirGraph::Node const& node = graph.GetNode(path.nodes[i]);
